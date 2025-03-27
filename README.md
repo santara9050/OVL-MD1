@@ -14,10 +14,6 @@
 ### Étape 3 : Créer une base de données
 - Cliquez ici pour créer: [DATA-BASE](https://supabase.com)
 - Si vous en avez déjà une c'est plus la peine d'en créer
-- Lien de la Base de données public:
-```sh
-postgresql://postgres.qnjvgxwyncnsbpfxwrbq:ovlmdmdpasse@aws-0-eu-central-1.pooler.supabase.com:6543/postgres
-```
 
 ### Étape 4 : Déployer OVL-MD
 
@@ -101,13 +97,7 @@ DATABASE=postgresql://postgres.qnjvgxwyncnsbpfxwrbq:ovlmdmdpasse@aws-0-eu-centra
 LEVEL_UP=non
 STICKER_PACK_NAME=Wa-sticker
 STICKER_AUTHOR_NAME=OVL-MD
-ANTIDELETE=off/pm/status/gc/all
 RENDER_API_KEY=
-DL_STATUS=on/off
-ANTI_VUE_UNIQUE=on/off
-LIKE_STATUS=on/off
-PRESENCE=off/enregistre/ecrit/enligne
-LECTURE_STATUS=on/off
 ```
 ---
 
