@@ -10,12 +10,6 @@ module.exports = {
   LEVEL_UP: process.env.LEVEL_UP || "non",
   STICKER_PACK_NAME: process.env.STICKER_PACK_NAME || "Wa-sticker",
   STICKER_AUTHOR_NAME: process.env.STICKER_AUTHOR_NAME || "OVL-MD",
-  DATABASE: process.env.DATABASE || "postgresql://postgres.qnjvgxwyncnsbpfxwrbq:ovlmdmdpasse@aws-0-eu-central-1.pooler.supabase.com:6543/postgres",
-  ANTIDELETE: process.env.ANTIDELETE || "non",
+  DATABASE: process.env.DATABASE,
   RENDER_API_KEY: process.env.RENDER_API_KEY,
-  PRESENCE: process.env.PRESENCE || "off",
-  LIKE_STATUS: process.env.LIKE_STATUS || "off",
-  ANTI_VUE_UNIQUE: process.env.ANTI_VUE_UNIQUE || "off", 
-  DL_STATUS: process.env.DL_STATUS || "off",
-  LECTURE_STATUS: process.env.LECTURE_STATUS || "off",
 };
