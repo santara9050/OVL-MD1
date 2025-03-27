@@ -10,6 +10,7 @@ let evt = require(__dirname + "/framework/ovlcmd");
 const FileType = require('file-type')
 const prefixe = config.PREFIXE;
 const { Antilink, Antilink_warnings } = require("./DataBase/antilink");
+const { Antitag, Antitag_warnings } = require("./DataBase/antitag");
 const { Antibot, AntibotWarnings } = require("./DataBase/antibot");
 const { Bans } = require("./DataBase/ban");
 const { GroupSettings } = require("./DataBase/events");
@@ -17,6 +18,7 @@ const { levels, calculateLevel } = require('./DataBase/levels');
 const { Ranks } = require('./DataBase/rank');
 const { Sudo } = require('./DataBase/sudo');
 const { getMessage, addMessage } = require('./framework/store');
+const { WA_CONF } = require('./DataBase/Wa_conf');
 
  async function ovlAuth(session) {
     let sessionId;
@@ -340,7 +342,7 @@ ${provenance}
  };
  
 //Antitag 
-if (ms.mentionedJid && ms.mentionedJid.length > 30) {
+if (ms.message[mtype].contextInfo.mentionedJid && ms.message[mtype].contextInfo.mentionedJid.length > 30) {
     try {
         const settings = await Antitag.findOne({ where: { id: ms_org } });
 
