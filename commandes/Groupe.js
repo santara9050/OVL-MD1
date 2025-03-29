@@ -257,34 +257,37 @@ ovlcmd(
     
     if (!verif_Groupe) return ovl.sendMessage(ms_org, { text: "Commande utilisable uniquement dans les groupes." });
     
-    if (prenium_id || verif_Admin) {
-      const membres = await infos_Groupe.participants;
-      const admins = membres.filter((m) => m.admin).map((m) => m.id);
-      
-      if (!verif_Ovl_Admin) {
-        return ovl.sendMessage(ms_org, { text: "Je dois être administrateur pour effectuer cette action." });
-      } 
-      const settings = await GroupSettings.findOne({ where: { id: ms_org } });
-
-      if (settings && settings.goodbye == "oui") {
-        return ovl.sendMessage(ms_org, { text: "Désactivez le goodbye message (goodbye off) avant de continuer." });
-      }
-      const nonAdmins = membres.filter((m) => !m.admin && !dev_num.includes(m.id)).map((m) => m.id);
-
-      if (nonAdmins.length === 0) {
-        return ovl.sendMessage(ms_org, { text: "Il n'y a aucun membre non administrateur à exclure." });
-      }
-
-      try {
-        await ovl.groupParticipantsUpdate(ms_org, nonAdmins, "remove");
-        ovl.sendMessage(ms_org, { text: "Tous les membres non administrateurs ont été exclus du groupe." });
-      } catch (err) {
-        console.error("Erreur :", err);
-        ovl.sendMessage(ms_org, { text: "Une erreur est survenue lors de l'exclusion des membres non administrateurs." });
-      }
-    } else {
+    if (!(prenium_id || verif_Admin)) {
       return ovl.sendMessage(ms_org, { text: "Vous n'avez pas la permission d'utiliser cette commande." });
     }
+
+    if (!verif_Ovl_Admin) {
+      return ovl.sendMessage(ms_org, { text: "Je dois être administrateur pour effectuer cette action." });
+    }
+
+    const settings = await GroupSettings.findOne({ where: { id: ms_org } });
+
+    if (settings && settings.goodbye == "oui") {
+      return ovl.sendMessage(ms_org, { text: "Désactivez le goodbye message (goodbye off) avant de continuer." });
+    }
+
+    const membres = await infos_Groupe.participants;
+    const nonAdmins = membres.filter((m) => !m.admin && !dev_num.includes(m.id)).map((m) => m.id);
+
+    if (nonAdmins.length === 0) {
+      return ovl.sendMessage(ms_org, { text: "Il n'y a aucun membre non administrateur à exclure." });
+    }
+
+    for (const membre of nonAdmins) {
+      try {
+        await ovl.groupParticipantsUpdate(ms_org, [membre], "remove");
+        await new Promise((resolve) => setTimeout(resolve, 1500));
+      } catch (err) {
+        console.error(`Erreur lors de l'exclusion de ${membre} :`, err);
+      }
+    }
+
+    ovl.sendMessage(ms_org, { text: `✅ ${nonAdmins.length} membre(s) ont été exclus du groupe.` });
   }
 );
 
@@ -301,41 +304,48 @@ ovlcmd(
     if (!verif_Groupe) 
       return ovl.sendMessage(ms_org, { text: "Commande utilisable uniquement dans les groupes." });
     
-    if (prenium_id || verif_Admin) {
-      if (!arg[0]) 
-        return ovl.sendMessage(ms_org, { text: "Veuillez spécifier l'indicatif." });
-
-      const indicatif = arg[0];
-      const membres = await infos_Groupe.participants;
-
-      if (!verif_Ovl_Admin) {
-        return ovl.sendMessage(ms_org, { text: "Je dois être administrateur pour effectuer cette action." });
-      }
-      const settings = await GroupSettings.findOne({ where: { id: ms_org } });
-
-      if (settings && settings.goodbye == "oui") {
-        return ovl.sendMessage(ms_org, { text: "Désactivez le goodbye message (goodbye off) avant de continuer." });
-      }
-        const membresToKick = membres
-        .filter((m) => m.id.startsWith(indicatif) && !m.admin && !dev_num.includes(m.id))
-        .map((m) => m.id);
-
-      if (membresToKick.length === 0) {
-        return ovl.sendMessage(ms_org, { text: `Aucun membre non administrateur trouvé avec l'indicatif ${indicatif}.` });
-      }
-      if (dev_num.includes(auteur_Msg_Repondu) && !dev_id) {
-      return ovl.sendMessage(ms_org, { text: "Vous ne pouvez pas supprimer un développeur." });
-      }
-      try {
-        await ovl.groupParticipantsUpdate(ms_org, membresToKick, "remove");
-        ovl.sendMessage(ms_org, { text: `Tous les membres non administrateurs dont le JID commence par ${indicatif} ont été exclus du groupe.` });
-      } catch (err) {
-        console.error("Erreur :", err);
-        ovl.sendMessage(ms_org, { text: "Une erreur est survenue lors de l'exclusion des membres." });
-      }
-    } else {
+    if (!(prenium_id || verif_Admin)) {
       return ovl.sendMessage(ms_org, { text: "Vous n'avez pas la permission d'utiliser cette commande." });
     }
+
+    if (!arg[0]) 
+      return ovl.sendMessage(ms_org, { text: "Veuillez spécifier l'indicatif." });
+
+    const indicatif = arg[0];
+    const membres = await infos_Groupe.participants;
+
+    if (!verif_Ovl_Admin) {
+      return ovl.sendMessage(ms_org, { text: "Je dois être administrateur pour effectuer cette action." });
+    }
+
+    const settings = await GroupSettings.findOne({ where: { id: ms_org } });
+
+    if (settings && settings.goodbye == "oui") {
+      return ovl.sendMessage(ms_org, { text: "Désactivez le goodbye message (goodbye off) avant de continuer." });
+    }
+
+    const membresToKick = membres
+      .filter((m) => m.id.startsWith(indicatif) && !m.admin && !dev_num.includes(m.id))
+      .map((m) => m.id);
+
+    if (membresToKick.length === 0) {
+      return ovl.sendMessage(ms_org, { text: `Aucun membre non administrateur trouvé avec l'indicatif ${indicatif}.` });
+    }
+
+    if (dev_num.includes(auteur_Msg_Repondu) && !dev_id) {
+      return ovl.sendMessage(ms_org, { text: "Vous ne pouvez pas supprimer un développeur." });
+    }
+
+    for (const membre of membresToKick) {
+      try {
+        await ovl.groupParticipantsUpdate(ms_org, [membre], "remove");
+        await new Promise((resolve) => setTimeout(resolve, 1500));
+      } catch (err) {
+        console.error(`Erreur lors de l'exclusion de ${membre} :`, err);
+      }
+    }
+
+    ovl.sendMessage(ms_org, { text: `✅ ${membresToKick.length} membre(s) ayant l'indicatif ${indicatif} ont été exclus du groupe.` });
   }
 );
 
