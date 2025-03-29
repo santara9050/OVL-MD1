@@ -6,6 +6,7 @@ const config = require('../set');
 const axios = require("axios");
 const { Sticker, StickerTypes } = require("wa-sticker-formatter");
 const cheerio = require('cheerio');
+const { WA_CONF } = require('../DataBase/Wa_conf');
 
 ovlcmd(
   {
@@ -466,6 +467,120 @@ if (!prenium_id) {
     } catch (error) {
       console.error(error);
       return ovl.sendMessage(ms_org, { text: "Une erreur est survenue lors de l'extraction du contenu de la page web." });
+    }
+  }
+);
+
+ovlcmd(
+  {
+    nom_cmd: "antidelete",
+    classe: "Owner",
+    react: "🔗",
+    desc: "Configure ou désactive l'Antidelete",
+  },
+  async (jid, ovl, cmd_options) => {
+    const { ms, repondre, arg, prenium_id } = cmd_options;
+    
+    try {
+      if (!prenium_id) {
+        return repondre("Seuls les utilisateurs premium peuvent utiliser cette commande.");
+      }
+
+      const sousCommande = arg[0]?.toLowerCase();
+      const validTypes = {
+        1: 'pm',
+        2: 'gc',
+        3: 'status',
+        4: 'all',
+        5: 'pm/gc',
+        6: 'pm/status',
+        7: 'gc/status'
+      };
+
+      const [settings] = await CONF.findOrCreate({
+        where: { id: jid },
+        defaults: { id: jid, antidelete: 'non' },
+      });
+
+      if (sousCommande === 'off') {
+        if (settings.antidelete === 'non') {
+          return repondre("L'Antidelete est déjà désactivé.");
+        }
+        settings.antidelete = 'non';
+        await settings.save();
+        return repondre("L'Antidelete désactivé avec succès !");
+      }
+
+      const typeSelection = parseInt(sousCommande);
+      if (validTypes[typeSelection]) {
+        const selectedType = validTypes[typeSelection];
+
+        if (settings.antidelete === selectedType) {
+          return repondre(`L'Antidelete est déjà configuré sur ${selectedType}.`);
+        }
+
+        settings.antidelete = selectedType;
+        await settings.save();
+        return repondre(`L'Antidelete est maintenant configuré sur ${selectedType}.`);
+      }
+
+      return repondre(
+        "Utilisation :\n" +
+        "antidelete off: Désactiver l'antidelete\n\n" +
+        "antidelete 1: Configurer l'action antidelete sur les messages privés (pm)\n" +
+        "antidelete 2: Configurer l'action antidelete sur les messages de groupe (gc)\n" +
+        "antidelete 3: Configurer l'action antidelete sur les statuts (status)\n" +
+        "antidelete 4: Configurer l'action antidelete sur tous les types (all)\n" +
+        "antidelete 5: Configurer l'action antidelete sur les messages privés et de groupe (pm/gc)\n" +
+        "antidelete 6: Configurer l'action antidelete sur les messages privés et les statuts (pm/status)\n" +
+        "antidelete 7: Configurer l'action antidelete sur les messages de groupe et les statuts (gc/status)"
+      );
+    } catch (error) {
+      console.error("Erreur lors de la configuration d'antidelete :", error);
+      repondre("Une erreur s'est produite lors de l'exécution de la commande.");
+    }
+  }
+);
+
+ovlcmd(
+  {
+    nom_cmd: "antivv",
+    classe: "Owner",
+    react: "👀",
+    desc: "Active ou désactive l'antivv",
+  },
+  async (jid, ovl, cmd_options) => {
+    const { ms, repondre, arg, prenium_id } = cmd_options;
+    try {
+      if (!prenium_id) {
+        return repondre("Seuls les utilisateurs prenium peuvent utiliser cette commande");
+      }
+
+      const sousCommande = arg[0]?.toLowerCase();
+      const validtypes = ['on', 'off'];
+
+      const [settings] = await CONF.findOrCreate({
+        where: { id: jid },
+        defaults: { id: jid, antivv: 'non' },
+      });
+
+      if (validtypes.includes(sousCommande)) {
+        const newMode = sousCommande === 'on' ? 'oui' : 'non';
+
+        if (settings.antivv === newMode) {
+          return repondre(`L'Antivv est déjà réglé sur ${sousCommande === 'on' ? 'activé' : 'désactivé'}`);
+        }
+
+        settings.antivv = newMode;
+        await settings.save();
+        return repondre(`L'Antivv ${sousCommande === 'on' ? 'activé' : 'désactivé'} avec succès !`);
+      }
+
+      return repondre("Utilisation :\n" +
+        "antivv on/off: Activer ou désactiver l'antivv");
+    } catch (error) {
+      console.error("Erreur lors de la configuration d'antivv :", error);
+      repondre("Une erreur s'est produite lors de l'exécution de la commande.");
     }
   }
 );
