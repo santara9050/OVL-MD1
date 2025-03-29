@@ -30,31 +30,31 @@ const WA_CONF = sequelize.define(
       type: DataTypes.STRING,
       primaryKey: true,
     },
-    PRESENCE: {
+    presence: {
       type: DataTypes.STRING,
       defaultValue: "rien",
     },
-    LECTURE_STATUS: {
+    lecture_status: {
       type: DataTypes.STRING,
       defaultValue: "non",
     },
-    LIKE_STATUS: {
+    like_status: {
       type: DataTypes.STRING,
       defaultValue: "non",
     },
-    DL_STATUS: {
+    dl_status : {
       type: DataTypes.STRING,
       defaultValue: "non",
     },
-    ANTI_VUE_UNIQUE: {
+    antivv: {
       type: DataTypes.STRING,
       defaultValue: "non",
     },
-    ANTIDELETE: {
+    antidelete: {
       type: DataTypes.STRING,
       defaultValue: "non",
     },
-    MENTION: {
+    mention: {
       type: DataTypes.STRING,
       defaultValue: "non",
     },
