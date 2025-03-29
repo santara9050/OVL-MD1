@@ -192,6 +192,8 @@ const verif_Admin = verif_Groupe
     }
  };
  // Fin Rank et Level up
+
+ //début global cmds
  try {
  const settings = await WA_CONF.findOne({ where: { id: '1' } });
         if (!settings) return;
@@ -340,9 +342,10 @@ ${provenance}
  } catch (err) {
   console.error('error dans wa_conf:', err)
  };
- 
+ //fin cmds global 
 //Antitag 
-if (ms.message[mtype].contextInfo.mentionedJid && ms.message[mtype].contextInfo.mentionedJid.length > 30) {
+ if (ms.message?.[mtype]?.contextInfo?.mentionedJid?.length > 30) {
+
     try {
         const settings = await Antitag.findOne({ where: { id: ms_org } });
 
