@@ -10,24 +10,20 @@ ovlcmd(
     },
     async (ms_org, ovl, _cmd_options) => {
         const { ms, msg_Repondu, repondre } = _cmd_options;
-        
-        if (ms_org !== "status@broadcast") {
-            return repondre("Cette commande ne fonctionne que sur les statuts WhatsApp.");
-        }
-
+         
         try {
             let media, options = { quoted: ms };
             
-            if (ms.message.extendedTextMessage) {
-                await ovl.sendMessage(ovl.user.id, { text: ms.message.extendedTextMessage.text }, options);
-            } else if (ms.message.imageMessage) {
-                media = await ovl.dl_save_media_ms(ms.message.imageMessage);
-                await ovl.sendMessage(ovl.user.id, { image: { url: media }, caption: ms.message.imageMessage.caption }, options);
-            } else if (ms.message.videoMessage) {
-                media = await ovl.dl_save_media_ms(ms.message.videoMessage);
-                await ovl.sendMessage(ovl.user.id, { video: { url: media }, caption: ms.message.videoMessage.caption }, options);
-            } else if (ms.message.audioMessage) {
-                media = await ovl.dl_save_media_ms(ms.message.audioMessage);
+            if (msg_Repondu.extendedTextMessage) {
+                await ovl.sendMessage(ovl.user.id, { text: msg_Repondu.extendedTextMessage.text }, options);
+            } else if (msg_Repondu.imageMessage) {
+                media = await ovl.dl_save_media_ms(msg_Repondu.imageMessage);
+                await ovl.sendMessage(ovl.user.id, { image: { url: media }, caption: msg_Repondu.imageMessage.caption }, options);
+            } else if (msg_Repondu.videoMessage) {
+                media = await ovl.dl_save_media_ms(msg_Repondu.videoMessage);
+                await ovl.sendMessage(ovl.user.id, { video: { url: media }, caption: msg_Repondu.videoMessage.caption }, options);
+            } else if (msg_Repondu.audioMessage) {
+                media = await ovl.dl_save_media_ms(msg_Repondu.audioMessage);
                 await ovl.sendMessage(id_Bot, { audio: { url: media }, mimetype: "audio/mp4", ptt: false }, options);
             } else {
                 return repondre("Ce type de statut n'est pas pris en charge.");
