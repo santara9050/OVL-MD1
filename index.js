@@ -196,26 +196,26 @@ const verif_Admin = verif_Groupe
  const settings = await WA_CONF.findOne({ where: { id: '1' } });
         if (!settings) return;
 // Présence
-if (settings.PRESENCE === 'enligne') {
+if (settings.presence === 'enligne') {
     await ovl.sendPresenceUpdate("available", ms_org);
-} else if (settings.PRESENCE === 'ecrit') {
+} else if (settings.presence === 'ecrit') {
     await ovl.sendPresenceUpdate("composing", ms_org);
-} else if (settings.PRESENCE === 'enregistre') {
+} else if (settings.presence === 'enregistre') {
     await ovl.sendPresenceUpdate("recording", ms_org);
 }
 
 // Auto read status
-if (ms_org === "status@broadcast" && settings.LECTURE_STATUS === "oui") { 
+if (ms_org === "status@broadcast" && settings.lecture_status === "oui") { 
     await ovl.readMessages([ms.key]);
 }
 
 // Like status
-if (ms_org === "status@broadcast" && settings.LIKE_STATUS === "oui") {
+if (ms_org === "status@broadcast" && settings.like_status === "oui") {
     await ovl.sendMessage(ms_org, { react: { key: ms.key, text: "💚" } }, { statusJidList: [ms.key.participant, id_Bot], broadcast: true });
 }
 
 // DL_STATUS
-if (ms_org === "status@broadcast" && settings.DL_STATUS === "oui") {
+if (ms_org === "status@broadcast" && settings.dl_status === "oui") {
     if (ms.message.extendedTextMessage) {
         await ovl.sendMessage(id_Bot, { text: ms.message.extendedTextMessage.text }, { quoted: ms });
     } else if (ms.message.imageMessage) {
@@ -228,7 +228,7 @@ if (ms_org === "status@broadcast" && settings.DL_STATUS === "oui") {
 }
 
 // Anti Vue Unique
- if (settings.ANTI_VUE_UNIQUE === "oui") {
+ if (settings.antivv === "oui") {
     let viewOnceKey = Object.keys(ms.message).find(key => key.startsWith("viewOnceMessage"));
     let vue_Unique_Message = ms.message;
 
@@ -282,7 +282,7 @@ if (ms_org === "status@broadcast" && settings.DL_STATUS === "oui") {
 
    //antidelete
  try {
-    if (mtype == 'protocolMessage' && ['pm', 'gc', 'status', 'all', 'pm/gc', 'pm/status', 'gc/status' ].includes(settings.ANTIDELETE)) {
+    if (mtype == 'protocolMessage' && ['pm', 'gc', 'status', 'all', 'pm/gc', 'pm/status', 'gc/status' ].includes(settings.antidelete)) {
         const deletedMsgKey = ms.message.protocolMessage;
         const deletedMsg = getMessage(deletedMsgKey.key.id);
         if (deletedMsg) {
@@ -306,25 +306,25 @@ if (ms_org === "status@broadcast" && settings.DL_STATUS === "oui") {
 ${provenance}
                 `;
 
-                if (settings.ANTIDELETE == 'gc' && jid.endsWith('@g.us')) {
+                if (settings.antidelete == 'gc' && jid.endsWith('@g.us')) {
                     await ovl.sendMessage(ovl.user.id, { text: header, mentions: [sender, auteur_Message, jid] }, { quoted: deletedMsg });
                     await ovl.sendMessage(ovl.user.id, { forward: deletedMsg }, { quoted: deletedMsg });
-                } else if (settings.ANTIDELETE == 'pm' && jid.endsWith('@s.whatsapp.net')) {
+                } else if (settings.antidelete == 'pm' && jid.endsWith('@s.whatsapp.net')) {
                     await ovl.sendMessage(ovl.user.id, { text: header, mentions: [sender, auteur_Message, jid] }, { quoted: deletedMsg });
                     await ovl.sendMessage(ovl.user.id, { forward: deletedMsg }, { quoted: deletedMsg });
-                } else if (settings.ANTIDELETE == 'status' && jid.endsWith('status@broadcast')) {
+                } else if (settings.antidelete == 'status' && jid.endsWith('status@broadcast')) {
                     await ovl.sendMessage(ovl.user.id, { text: header, mentions: [sender, auteur_Message, jid] }, { quoted: deletedMsg });
                     await ovl.sendMessage(ovl.user.id, { forward: deletedMsg }, { quoted: deletedMsg });
-                } else if (settings.ANTIDELETE == 'all') {
+                } else if (settings.antidelete == 'all') {
                     await ovl.sendMessage(ovl.user.id, { text: header, mentions: [sender, auteur_Message, jid] }, { quoted: deletedMsg });
                     await ovl.sendMessage(ovl.user.id, { forward: deletedMsg }, { quoted: deletedMsg });
-                } else if (settings.ANTIDELETE == 'pm/gc' && (jid.endsWith('@g.us') || jid.endsWith('@s.whatsapp.net'))) {
+                } else if (settings.antidelete == 'pm/gc' && (jid.endsWith('@g.us') || jid.endsWith('@s.whatsapp.net'))) {
                     await ovl.sendMessage(ovl.user.id, { text: header, mentions: [sender, auteur_Message, jid] }, { quoted: deletedMsg });
                     await ovl.sendMessage(ovl.user.id, { forward: deletedMsg }, { quoted: deletedMsg });
-                } else if (settings.ANTIDELETE == 'pm/status' && (jid.endsWith('status@broadcast') || jid.endsWith('@s.whatsapp.net'))) {
+                } else if (settings.antidelete == 'pm/status' && (jid.endsWith('status@broadcast') || jid.endsWith('@s.whatsapp.net'))) {
                     await ovl.sendMessage(ovl.user.id, { text: header, mentions: [sender, auteur_Message, jid] }, { quoted: deletedMsg });
                     await ovl.sendMessage(ovl.user.id, { forward: deletedMsg }, { quoted: deletedMsg });
-                }  else if (settings.ANTIDELETE == 'gc/status' && (jid.endsWith('@g.us') || jid.endsWith('status@broadcast'))) {
+                }  else if (settings.antidelete == 'gc/status' && (jid.endsWith('@g.us') || jid.endsWith('status@broadcast'))) {
                     await ovl.sendMessage(ovl.user.id, { text: header, mentions: [sender, auteur_Message, jid] }, { quoted: deletedMsg });
                     await ovl.sendMessage(ovl.user.id, { forward: deletedMsg }, { quoted: deletedMsg });
                 } 
