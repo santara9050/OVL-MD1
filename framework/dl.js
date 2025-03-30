@@ -5,18 +5,27 @@ const cookie = require("cookie");
 async function fbdl(url, maxRetries = 5) {
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
-      const rep = await axios.post(
-        "https://fsave.net/proxy.php",
-        new URLSearchParams({ url }).toString(),
+      const payload = new URLSearchParams({ id: url, locale: 'en' }).toString();
+      const response = await axios.post(
+        'https://getmyfb.com/process',
+        payload,
         {
           headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
         }
       );
 
-      return rep.data.api.previewUrl.replace(/\\\//g, '/');
+      const $ = cheerio.load(response.data);
+      const firstLink = $('.results-list-item a').first().attr('href');
+
+      if (!firstLink) {
+        throw new Error("❌ Aucun lien MP4 trouvé.");
+      }
+
+      return firstLink;
     } catch (error) {
+      console.log(`⚠️ Tentative ${attempt} échouée: ${error.message}`);
       if (attempt === maxRetries) {
         throw error;
       }
@@ -188,67 +197,43 @@ async function twitterdl(url, maxRetries = 5) {
   }
 };
 
-async function ytdl(url, format = "m4a", maxRetries = 15) {
+async function ytdl(url, format = 'mp4', maxRetries = 15) {
   let attempts = 0;
 
   while (attempts < maxRetries) {
     try {
       attempts++;
-
-      const response = await axios.get("https://en.loader.to/4/", {
-        headers: {
-          "User-Agent": "GoogleBot",
-        },
-        maxRedirects: 5,
+      const response = await axios.post('https://www.clipto.com/api/youtube', {
+        url: url, 
       });
-
-      const cookies = response.headers["set-cookie"] || [];
-      const initialCookies = cookies
-        .map((cookieStr) => cookie.parse(cookieStr))
-        .reduce((acc, curr) => ({ ...acc, ...curr }), {});
-
-      const sessionCookies = Object.entries(initialCookies)
-        .map(([key, value]) => cookie.serialize(key, value))
-        .join("; ");
-
-      const req = await axios.get(
-        `https://p.oceansaver.in/ajax/download.php?format=${format}&url=${encodeURIComponent(url)}`,
-        {
-          headers: {
-            "User-Agent": "GoogleBot",
-            "cookie": sessionCookies,
-          },
+      
+      if (response.data.success) {
+        const data = response.data;
+        const medias = data.medias.filter(item => item.extension === format && item.is_audio === true);
+        
+        if (medias.length === 0) {
+          throw new Error(`Format ${format} non disponible ou audio non trouvé pour cette vidéo.`);
         }
-      );
 
-      const id = req.data?.id;
-      if (!id) {
-        throw new Error("Impossible d'obtenir l'ID de téléchargement.");
+        const media = medias[medias.length - 1];
+        return media.url;
+      } else {
+        throw new Error("Erreur API: " + response.data.message);
       }
 
-      const progressReq = await axios.get(
-        `https://p.oceansaver.in/ajax/progress.php?id=${id}`,
-        {
-          headers: {
-            "User-Agent": "GoogleBot",
-            "cookie": sessionCookies,
-          },
-        }
-      );
-
-      const downloadUrl = progressReq.data?.download_url;
-      if (!downloadUrl) {
-        throw new Error("Lien de téléchargement introuvable.");
-      }
-
-      return downloadUrl;
     } catch (error) {
+      console.error("Erreur lors de la récupération des données : ", error.message);
+      
       if (attempts >= maxRetries) {
-        throw error;
+        throw new Error("Impossible de récupérer les données après " + maxRetries + " tentatives.");
       }
+
       await new Promise((resolve) => setTimeout(resolve, 2000));
     }
   }
 }
 
 module.exports = { fbdl, ttdl, igdl, twitterdl, ytdl };
+
+
+
