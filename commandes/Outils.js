@@ -24,7 +24,7 @@ ovlcmd(
             await ovl.sendMessage(ms_org, { 
                 image: { url: img }, 
                 caption: mess 
-            });
+            }, { quoted: cmd_options.ms });
         } catch (error) {
             console.error("Erreur lors de l'envoi du message de test :", error.message || error);
         }
@@ -41,7 +41,7 @@ ovlcmd(
     },
     async (ms_org, ovl, cmd_options) => {
         try {
-            const { arg } = cmd_options;
+            const { arg, ms } = cmd_options;
             const commandes = cmd;
 
             if (arg.length) {
@@ -57,11 +57,11 @@ ovlcmd(
                         `Nom : *${commandeTrouvee.nom_cmd}*\n` +
                         `Alias : [${commandeTrouvee.alias.join(", ")}]\n` +
                         `Description : ${commandeTrouvee.desc}`;
-                    return await ovl.sendMessage(ms_org, { text: message });
+                    return await ovl.sendMessage(ms_org, { text: message }, { quoted: ms });
                 } else {
                     return await ovl.sendMessage(ms_org, {
                         text: `❌ Commande ou alias "${recherche}" introuvable. Vérifiez et réessayez.`,
-                    });
+                    }, { quoted: ms });
                 }
             }
 
@@ -70,10 +70,10 @@ ovlcmd(
                 descriptionMsg += `Nom : *${cmd.nom_cmd}*\nAlias : [${cmd.alias.join(", ")}]\nDescription : ${cmd.desc}\n\n`;
             });
 
-            await ovl.sendMessage(ms_org, { text: descriptionMsg });
+            await ovl.sendMessage(ms_org, { text: descriptionMsg }, { quoted: ms });
         } catch (error) {
             console.error("Erreur lors de l'affichage des descriptions :", error.message || error);
-            await ovl.sendMessage(ms_org, { text: "Une erreur s'est produite lors de l'affichage des descriptions." });
+            await ovl.sendMessage(ms_org, { text: "Une erreur s'est produite lors de l'affichage des descriptions." }, { quoted: ms });
         }
     }
 );
@@ -134,7 +134,7 @@ ovlcmd(
             }
 
             menu += "> ©2024 OVL-MD WA-BOT";
-            await ovl.sendMessage(ms_org, { image: { url: lien }, caption: menu });
+            await ovl.sendMessage(ms_org, { image: { url: lien }, caption: menu }, { quoted: cmd_option.ms });
         } catch (error) {
             console.error("Erreur lors de la génération du menu :", error);
         }
@@ -217,12 +217,12 @@ ovlcmd(
         react: "🏓",
         desc: "Mesure la latence du bot.",
     },
-    async (ms_org, ovl) => {
+    async (ms_org, ovl, cmd_options ) => {
         const start = Date.now();
-        await ovl.sendMessage(ms_org, { text: "Ping..." });
+        await ovl.sendMessage(ms_org, { text: "Ping..." }, { quoted: cmd_options.ms });
         const end = Date.now();
         const latency = end - start;
-        await ovl.sendMessage(ms_org, { text: `🏓 Pong ! Latence : ${latency}ms` });
+        await ovl.sendMessage(ms_org, { text: `🏓 Pong ! Latence : ${latency}ms` }, { quoted: cmd_options.ms });
     }
 );
 
@@ -234,7 +234,7 @@ ovlcmd(
         desc: "Affiche le temps de fonctionnement du bot.",
         alias: ["upt"],
     },
-    async (ms_org, ovl) => {
+    async (ms_org, ovl, cmd_options) => {
         const seconds = process.uptime();
         const j = Math.floor(seconds / 86400);
         const h = Math.floor((seconds / 3600) % 24);
@@ -245,7 +245,7 @@ ovlcmd(
         if (h > 0) uptime += `${h}H `;
         if (m > 0) uptime += `${m}M `;
         if (s > 0) uptime += `${s}S`;
-        await ovl.sendMessage(ms_org, { text: `⏳ Temps de fonctionnement : ${uptime}` });
+        await ovl.sendMessage(ms_org, { text: `⏳ Temps de fonctionnement : ${uptime}` }, { quoted: cmd_options.ms });
     }
 );
 
@@ -268,7 +268,7 @@ ovlcmd(
             lang = arg[0];
             text = arg.slice(1).join(" ");
         } else {
-            return await ovl.sendMessage(ms_org, { text: `Utilisation : ${prefixe}translate <langue> <texte> ou répondre à un message avec : ${prefixe}translate <langue>` });
+            return await ovl.sendMessage(ms_org, { text: `Utilisation : ${prefixe}translate <langue> <texte> ou répondre à un message avec : ${prefixe}translate <langue>` }, { quoted: ms });
         }
 
         try {
@@ -276,7 +276,7 @@ ovlcmd(
             await ovl.sendMessage(ms_org, { text: `🌐Traduction (${lang}) :\n${result.text}` }, { quoted: ms });
         } catch (error) {
             console.error("Erreur lors de la traduction:", error);
-            await ovl.sendMessage(ms_org, { text: "Erreur lors de la traduction. Vérifiez la langue et le texte fournis." });
+            await ovl.sendMessage(ms_org, { text: "Erreur lors de la traduction. Vérifiez la langue et le texte fournis." }, { quoted: ms });
         }
     }
 );
@@ -327,12 +327,12 @@ ovlcmd(
     desc: "Prend une capture d'écran d'un site web.",
   },
   async (ms_org, ovl, cmd_options) => {
-    const { arg, prefixe } = cmd_options;
+    const { arg, prefixe, ms } = cmd_options;
 
     if (!arg[0]) {
       return ovl.sendMessage(ms_org, {
         text: `Entrez un lien`,
-      });
+      }, { quoted: ms });
     }
 
   /*  const url = arg[0];
@@ -349,12 +349,12 @@ ovlcmd(
           await ovl.sendMessage(ms_org, {
         image: `https://image.thum.io/get/fullpage/${arg[0]}`,
         caption: `Voici la capture d'écran de: ${url}`,
-      });
+      }, { quoted: ms });
     } catch (error) {
       console.error('Erreur lors de la capture de l\'écran:', error.message); // Log pour l'erreur générale
       return ovl.sendMessage(ms_org, {
         text: "Une erreur est survenue lors de la capture du site. Veuillez réessayer plus tard.",
-      });
+      }, { quoted: ms });
     }
   }
 );
@@ -411,7 +411,7 @@ ovlcmd(
             `🆓 *Mémoire Libre*: ${freeMemory} GB\n` +
             `🌐 *Nom de l'Hôte*: ${hostname}\n` +
             `🎉 *Version*: OVL-MD 1.0.0`
-    });
+    }, { quoted: cmd_options.ms });
   }
 );
 
@@ -433,7 +433,7 @@ ovlcmd(
             fs.writeFile(filePath, qrImageBase64, 'base64', async (err) => {
                 if (err) {
                     console.error("Erreur lors de l'écriture du fichier :", err);
-                    await ovl.sendMessage(ms_org, { text: "Désolé, il y a eu une erreur lors de la génération du QR code." });
+                    await ovl.sendMessage(ms_org, { text: "Désolé, il y a eu une erreur lors de la génération du QR code." }, { quoted: ms });
                 } else {
                     console.log("Image sauvegardée avec succès !");
                     
@@ -445,7 +445,7 @@ ovlcmd(
 
         } catch (error) {
             console.error("Erreur lors de la génération du QR code:", error);
-            await ovl.sendMessage(ms_org, { text: "Désolé, il y a eu une erreur lors de la génération du QR code." });
+            await ovl.sendMessage(ms_org, { text: "Désolé, il y a eu une erreur lors de la génération du QR code." }, { quoted: ms });
         }
     }
 );
@@ -459,7 +459,7 @@ ovlcmd(
     async (ms_org, ovl, cmd_options) => {
         const { arg, ms } = cmd_options;
        if(!arg) {
-            return await ovl.sendMessage(ms_org, { text: "entrer un numéro de téléphone" });
+            return await ovl.sendMessage(ms_org, { text: "entrer un numéro de téléphone" }, { quoted: ms });
         }
         const bc = arg.join(" ");
 
@@ -472,7 +472,7 @@ ovlcmd(
             }, { quoted: ms });
         } catch (error) {
             console.error("Erreur lors de la génération du code:", error);
-            await ovl.sendMessage(ms_org, { text: "Désolé, il y a eu une erreur lors de la génération du code." });
+            await ovl.sendMessage(ms_org, { text: "Désolé, il y a eu une erreur lors de la génération du code." }, { quoted: ms });
         }
     }
 );
@@ -497,7 +497,7 @@ ovlcmd(
       
     } catch (error) {
       console.error(error);
-      return ovl.sendMessage(ms_org, { text: "Une erreur s'est produite lors de la création de l'email temporaire." });
+      return ovl.sendMessage(ms_org, { text: "Une erreur s'est produite lors de la création de l'email temporaire." }, { quoted: ms });
     }
   }
 );
