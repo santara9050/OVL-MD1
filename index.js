@@ -764,6 +764,45 @@ ovl.ev.on("connection.update", async (con) => {
         throw error;
     }
 };
+         ovl.recup_msg = async ({ expediteur, salon, limiteTemps = 0, condition = () => true } = {}) => {
+    return new Promise((accepter, refuser) => {
+        if (typeof expediteur !== 'string' || !expediteur) return refuser(new Error("L'expéditeur doit être une chaîne non vide."));
+        if (typeof salon !== 'string' || !salon) return refuser(new Error("Le salon doit être une chaîne non vide."));
+        if (limiteTemps && typeof limiteTemps !== 'number') return refuser(new Error("Le temps limite doit être un nombre."));
+        if (typeof condition !== 'function') return refuser(new Error("Le paramètre condition doit être une fonction."));
+
+        let chrono;
+
+        const analyseur = ({ type, messages }) => {
+            if (type !== "notify") return;
+
+            for (const msg of messages) {
+                const idSalon = msg.key.remoteJid;
+                const idExpediteur = msg.key.fromMe
+                    ? zk.user.id.replace(/:.*@/g, '@')
+                    : msg.key.participant
+                        ? msg.key.participant.replace(/:.*@/g, '@')
+                        : idSalon;
+
+                if (idExpediteur === expediteur && idSalon === salon && condition(msg)) {
+                    zk.ev.off('messages.upsert', analyseur);
+                    if (chrono) clearTimeout(chrono);
+                    return accepter(msg);
+                }
+            }
+        };
+
+        ovl.ev.on('messages.upsert', analyseur);
+
+        if (limiteTemps > 0) {
+            chrono = setTimeout(() => {
+                ovl.ev.off('messages.upsert', analyseur);
+                refuser(new Error("Temps écoulé sans réponse."));
+            }, limiteTemps);
+        }
+    });
+};
+
             //fin autre fonction ovl
     } catch (error) {
         console.error("Erreur principale:", error);
