@@ -20,7 +20,7 @@ async function sendMedia(ms_org, ovl, url, format, type) {
 
     const message = {
       [type]: Buffer.from(media.data),
-      mimetype: format === "ogg" ? "audio/mpeg" : "video/mp4",
+      mimetype: format === "weba" ? "audio/mpeg" : "video/mp4",
       caption: `\`\`\`Powered By OVL-MD\`\`\``
     };
 
@@ -68,7 +68,7 @@ ovlcmd(
 
             await ovl.sendMessage(ms_org, { image: { url: videoInfo.thumbnail }, caption });
 
-            await sendMedia(ms_org, ovl, videoInfo.url, "ogg", "audio");
+            await sendMedia(ms_org, ovl, videoInfo.url, "weba", "audio");
         } catch (error) {
             console.error("Erreur Song Downloader:", error.message);
             await ovl.sendMessage(ms_org, { text: "Erreur lors du téléchargement." });
@@ -114,7 +114,7 @@ ovlcmd(
                 image: { url: videoInfo.thumbnail },
                 caption: caption,
             });
-            await sendMedia(ms_org, ovl, video.url, "480", "video");
+            await sendMedia(ms_org, ovl, video.url, "mp4", "video");
         } catch (error) {
             await ovl.sendMessage(ms_org, {
                 text: "Une erreur est survenue lors du traitement de votre commande.",
@@ -142,7 +142,7 @@ ovlcmd(
     }
 
     try {
-      await sendMedia(ms_org, ovl, videoLink, "ogg", "audio");
+      await sendMedia(ms_org, ovl, videoLink, "weba", "audio");
     } catch (error) {
       ovl.sendMessage(ms_org, { text: `Erreur: ${error.message}` });
     }
@@ -168,7 +168,7 @@ ovlcmd(
     }
 
     try {
-      await sendMedia(ms_org, ovl, videoLink, "480", "video");
+      await sendMedia(ms_org, ovl, videoLink, "mp4", "video");
     } catch (error) {
       ovl.sendMessage(ms_org, { text: `Erreur: ${error.message}` });
     }
