@@ -12,7 +12,7 @@ const { search, download } = require("aptoide_scrapper_fixed");
 ovlcmd(
     {
         nom_cmd: "img",
-        classe: "search",
+        classe: "Search",
         react: "🔍",
         desc: "Recherche d'images"
     },
@@ -120,7 +120,7 @@ ovlcmd(
 ovlcmd(
     {
         nom_cmd: "lyrics",
-        classe: "search",
+        classe: "Search",
         react: "🎵",
         desc: "Cherche les paroles d'une chanson"
     },
@@ -148,7 +148,7 @@ ovlcmd(
 ovlcmd(
     {
         nom_cmd: "google",
-        classe: "search",
+        classe: "Search",
         desc: "Recherche sur Google.",
         alias: ["search"],
     },
@@ -197,7 +197,7 @@ ovlcmd(
 ovlcmd(
     {
         nom_cmd: "wiki",
-        classe: "search",
+        classe: "Search",
         react: "📖",
         desc: "Recherche sur Wikipédia.",
     },
@@ -226,7 +226,7 @@ ovlcmd(
 ovlcmd(
     {
         nom_cmd: "github",
-        classe: "search",
+        classe: "Search",
         react: "🔍",
         desc: "Récupère les informations d'un utilisateur GitHub"
     },
@@ -269,7 +269,7 @@ ovlcmd(
 ovlcmd(
     {
         nom_cmd: "imdb",
-        classe: "search",
+        classe: "Search",
         react: "🎬",
         desc: "Recherche des informations sur un film ou une série via IMDB"
     },
