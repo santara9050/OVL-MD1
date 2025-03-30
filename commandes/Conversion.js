@@ -11,6 +11,8 @@ const FormData = require('form-data');
 const { readFileSync } = require('fs');
 const catbox = new Catbox();
 const sharp = require('sharp');
+const GIFEncoder = require('gifencoder');
+
 
 async function uploadToCatbox(filePath) {
   try {
@@ -640,5 +642,90 @@ ovlcmd(
         text: "Une erreur est survenue lors de la conversion en audio. Veuillez réessayer plus tard.",
       });
     }
+  }
+);
+
+ovlcmd(
+  {
+    nom_cmd: "attp",
+    classe: "Conversion",
+    react: "📥",
+    desc: "Transforme du texte en sticker animé",
+  },
+  async (ms_org, ovl, cmd_options) => {
+    const { arg, repondre, nom_Auteur_Message } = cmd_options;
+    if (!arg[0]) return repondre("Veuillez fournir du texte");
+
+    const text = arg.join(' ');
+    const encoder = new GIFEncoder(500, 200);
+    encoder.start();
+    encoder.setRepeat(0);
+    encoder.setDelay(500);
+    encoder.setQuality(10);
+
+    const colors = ['#FF5733', '#33FF57', '#3357FF', '#FF33F6', '#F6FF33'];
+
+    for (let i = 0; i < 5; i++) {
+      const color = colors[i % colors.length];
+      const svg = `
+        <svg width="500" height="200" xmlns="http://www.w3.org/2000/svg">
+          <rect width="500" height="200" fill="black"/>
+          <text x="50%" y="50%" font-size="40" font-family="Sans" font-weight="bold"
+            fill="${color}" text-anchor="middle" dominant-baseline="middle">
+            ${text}
+          </text>
+        </svg>`;
+      const pngBuffer = await sharp(Buffer.from(svg)).png().toBuffer();
+      encoder.addFrame(pngBuffer);
+    }
+
+    encoder.finish();
+    const gifBuffer = encoder.out.getData();
+
+    let stickerMess = new Sticker(gifBuffer, {
+      pack: arg.join(' ') ? arg.join(' '): nom_Auteur_Message,
+      author: "",
+      type: StickerTypes.CROPPED,
+      quality: 70,
+      background: "transparent",
+    });
+
+    const stickerBuffer = await stickerMess.toBuffer();
+    ovl.sendMessage(ms_org, { sticker: stickerBuffer });
+  }
+);
+
+ovlcmd(
+  {
+    nom_cmd: "ttp",
+    classe: "Conversion",
+    react: "📥",
+    desc: "Transforme du texte en sticker",
+  },
+  async (ms_org, ovl, cmd_options) => {
+    const { arg, repondre, nom_Auteur_Message } = cmd_options;
+    if (!arg[0]) return repondre("Veuillez fournir du texte");
+
+    const text = arg.join(' ');
+    const svg = `
+      <svg width="500" height="500" xmlns="http://www.w3.org/2000/svg">
+        <rect width="500" height="500" fill="black"/>
+        <text x="50%" y="50%" font-size="40" font-family="Sans" font-weight="bold"
+          fill="white" text-anchor="middle" dominant-baseline="middle">
+          ${text}
+        </text>
+      </svg>`;
+    const pngBuffer = await sharp(Buffer.from(svg)).png().toBuffer();
+
+    let stickerMess = new Sticker(pngBuffer, {
+      pack: arg.join(' ') ? arg.join(' '): nom_Auteur_Message,
+      author: "",
+      type: StickerTypes.CROPPED,
+      quality: 70,
+      background: "transparent",
+    });
+
+    const stickerBuffer = await stickerMess.toBuffer();
+    ovl.sendMessage(ms_org, { sticker: stickerBuffer });
   }
 );
