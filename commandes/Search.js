@@ -17,21 +17,21 @@ ovlcmd(
         desc: "Recherche d'images"
     },
     async (ms_org, ovl, cmd_options) => {
-      const { arg } = cmd_options;
+      const { arg, ms } = cmd_options;
         const searchTerm = arg.join(" ");
         if (!searchTerm) {
-            return ovl.sendMessage(ms_org, { text: "Veuillez fournir un terme de recherche, par exemple : img ovl-Md" });
+            return ovl.sendMessage(ms_org, { text: "Veuillez fournir un terme de recherche, par exemple : img ovl-Md" },  { quoted: ms });
         }
 
         gis(searchTerm, async (error, results) => {
             if (error) {
                 console.error("Erreur lors de la recherche d'images:", error);
-                return ovl.sendMessage(ms_org, { text: "Erreur lors de la recherche d'images." });
+                return ovl.sendMessage(ms_org, { text: "Erreur lors de la recherche d'images." }, { quoted: ms });
             }
 
             const images = results.slice(0, 5);
             if (images.length === 0) {
-                return ovl.sendMessage(ms_org, { text: "Aucune image trouvée pour ce terme de recherche." });
+                return ovl.sendMessage(ms_org, { text: "Aucune image trouvée pour ce terme de recherche." }, { quoted: ms });
             }
 
             for (const image of images) {
@@ -39,7 +39,7 @@ ovlcmd(
                     await ovl.sendMessage(ms_org, {
                         image: { url: image.url },
                         caption: `\`\`\`Powered By OVL-MD\`\`\``
-                    });
+                    }, { quoted: ms });
                 } catch (err) {
                     console.error("Erreur lors de l'envoi de l'image:", err);
                 }
@@ -128,19 +128,19 @@ ovlcmd(
         const { arg, ms } = cmd_options;
         const songName = arg.join(" ");
         if (!songName) {
-            return ovl.sendMessage(ms_org, { text: "Veuillez fournir un nom de chanson pour obtenir les paroles." });
+            return ovl.sendMessage(ms_org, { text: "Veuillez fournir un nom de chanson pour obtenir les paroles." }, { quoted: ms });
         }
 
         try {
             const lyrics = await LyricsFinder(songName);
             const mess = `🎸OVL-MD LYRICS FINDER🥁\n\n🎼PAROLES =>\n\n${lyrics}`;
             if (!lyrics) {
-                return ovl.sendMessage(ms_org, { text: "Désolé, je n'ai pas trouvé les paroles pour cette chanson." });
+                return ovl.sendMessage(ms_org, { text: "Désolé, je n'ai pas trouvé les paroles pour cette chanson." }, { quoted: ms });
             }
             await ovl.sendMessage(ms_org, { text: mess }, {quoted: ms});
         } catch (error) {
             console.error("Erreur lors de la recherche des paroles :", error.message);
-            ovl.sendMessage(ms_org, { text: "Une erreur s'est produite lors de la recherche des paroles." });
+            ovl.sendMessage(ms_org, { text: "Une erreur s'est produite lors de la recherche des paroles." }, { quoted: ms });
         }
     }
 );
@@ -153,9 +153,9 @@ ovlcmd(
         alias: ["search"],
     },
     async (ms_org, ovl, cmd_options) => {
-        const { arg } = cmd_options;
+        const { arg, ms } = cmd_options;
         if (!arg[0]) {
-            return await ovl.sendMessage(ms_org, { text: "❗ Entrez un terme à rechercher sur Google." });
+            return await ovl.sendMessage(ms_org, { text: "❗ Entrez un terme à rechercher sur Google." }, { quoted: ms });
         }
 
         const searchTerm = arg.join(" ");
@@ -174,7 +174,7 @@ ovlcmd(
             if (!response.data.items || response.data.items.length === 0) {
                 return await ovl.sendMessage(ms_org, {
                     text: "❗ Aucun résultat trouvé pour cette recherche.",
-                });
+                }, { quoted: ms });
             }
 
             const results = response.data.items.slice(0, 3); // Limiter à 3 résultats
@@ -184,12 +184,12 @@ ovlcmd(
                 searchResultsMsg += `${index + 1}.\n *📌Titre:* ${result.title}\n*📃Description:* ${result.snippet}\n*🌐Lien:* ${result.link}\n\n`;
             });
 
-            await ovl.sendMessage(ms_org, { text: searchResultsMsg });
+            await ovl.sendMessage(ms_org, { text: searchResultsMsg }, { quoted: ms });
         } catch (error) {
             console.error("Erreur dans la recherche Google :", error);
             await ovl.sendMessage(ms_org, {
                 text: "❗ Une erreur est survenue lors de la recherche sur Google. Veuillez réessayer.",
-            });
+            }, { quoted: ms });
         }
     }
 );
@@ -202,9 +202,9 @@ ovlcmd(
         desc: "Recherche sur Wikipédia.",
     },
     async (ms_org, ovl, cmd_options) => {
-        const { arg } = cmd_options;
+        const { arg, ms } = cmd_options;
         if (!arg[0]) {
-            return await ovl.sendMessage(ms_org, { text: "❗ Entrez un terme à rechercher sur Wikipédia." });
+            return await ovl.sendMessage(ms_org, { text: "❗ Entrez un terme à rechercher sur Wikipédia." }, { quoted: ms });
         }
 
         const searchTerm = arg.join(" ");
@@ -213,12 +213,12 @@ ovlcmd(
 
             const mess = `*📖Wikipédia :*\n\n*📌Titre:* ${con.title}\n\n*📃Description:* ${con.description}\n\n*📄Résumé:* ${con.extract}\n\n*🌐Lien:* ${con.content_urls.mobile.page}`;
 
-            await ovl.sendMessage(ms_org, { text: mess });
+            await ovl.sendMessage(ms_org, { text: mess }, { quoted: ms });
         } catch (error) {
             console.error("Erreur dans la recherche Wikipédia :", error);
             await ovl.sendMessage(ms_org, {
                 text: "❗ Une erreur est survenue lors de la recherche sur Wikipédia. Veuillez réessayer.",
-            });
+            }, { quoted: ms });
         }
     }
 );
@@ -231,11 +231,11 @@ ovlcmd(
         desc: "Récupère les informations d'un utilisateur GitHub"
     },
     async (ms_org, ovl, cmd_options) => {
-        const { arg } = cmd_options;
+        const { arg, ms } = cmd_options;
         const username = arg.join(" ");
 
         if (!username) {
-            return ovl.sendMessage(ms_org, { text: "❗ Veuillez fournir un nom d'utilisateur GitHub à rechercher." });
+            return ovl.sendMessage(ms_org, { text: "❗ Veuillez fournir un nom d'utilisateur GitHub à rechercher." }, { quoted: ms });
         }
 
         try {
@@ -254,14 +254,14 @@ ovlcmd(
                 + `*🕰️ Créé le :* ${data.created_at.split("T")[0]}`;
 
             if (data.avatar_url) {
-                await ovl.sendMessage(ms_org, { image: { url: data.avatar_url }, caption: message });
+                await ovl.sendMessage(ms_org, { image: { url: data.avatar_url }, caption: message }, { quoted: ms });
             } else {
-                await ovl.sendMessage(ms_org, { text: message });
+                await ovl.sendMessage(ms_org, { text: message }, { quoted: ms });
             }
 
         } catch (error) {
             console.error("Erreur lors de la récupération des données GitHub :", error.message);
-            ovl.sendMessage(ms_org, { text: "❗ Impossible de récupérer les données GitHub.\n" + error.message });
+            ovl.sendMessage(ms_org, { text: "❗ Impossible de récupérer les données GitHub.\n" + error.message }, { quoted: ms });
         }
     }
 );
@@ -274,11 +274,11 @@ ovlcmd(
         desc: "Recherche des informations sur un film ou une série via IMDB"
     },
     async (ms_org, ovl, cmd_options) => {
-        const { arg } = cmd_options;
+        const { arg, ms } = cmd_options;
         const movieName = arg.join(" ");
 
         if (!movieName) {
-            return ovl.sendMessage(ms_org, { text: "❗ Veuillez fournir un nom de film ou de série à rechercher." });
+            return ovl.sendMessage(ms_org, { text: "❗ Veuillez fournir un nom de film ou de série à rechercher." },  { quoted: ms });
         }
 
         try {
@@ -286,7 +286,7 @@ ovlcmd(
             const data = response.data;
 
             if (data.Response === "False") {
-                return ovl.sendMessage(ms_org, { text: "❗ Impossible de trouver ce film ou cette série." });
+                return ovl.sendMessage(ms_org, { text: "❗ Impossible de trouver ce film ou cette série." },  { quoted: ms });
             }
 
             const trt_synopsis = await translate(data.Plot, { to: 'fr' }).then(res => res.text).catch(() => data.Plot);
@@ -316,14 +316,14 @@ ovlcmd(
                 + `*❎ Votes IMDb :* ${data.imdbVotes}`;
 
             if (data.Poster && data.Poster !== "N/A") {
-                await ovl.sendMessage(ms_org, { image: { url: data.Poster }, caption: imdbInfo });
+                await ovl.sendMessage(ms_org, { image: { url: data.Poster }, caption: imdbInfo }, { quoted: ms });
             } else {
-                await ovl.sendMessage(ms_org, { text: imdbInfo });
+                await ovl.sendMessage(ms_org, { text: imdbInfo }, { quoted: ms });
             }
 
         } catch (error) {
             console.error("Erreur lors de la récupération des données IMDB :", error.message);
-            ovl.sendMessage(ms_org, { text: "❗ Une erreur s'est produite lors de la recherche du film.\n" + error.message });
+            ovl.sendMessage(ms_org, { text: "❗ Une erreur s'est produite lors de la recherche du film.\n" + error.message }, { quoted: ms });
         }
     }
 );
@@ -331,20 +331,20 @@ ovlcmd(
 ovlcmd(
   {
     nom_cmd: "stickersearch",
-    classe: "search",
+    classe: "Search",
     react: "🖼️",
     desc: "Recherche et envoie des stickers animés basés sur un mot-clé.",
     alias: ["sstick"]
   },
   async (ms_org, ovl, cmd_options) => {
-    const { arg, auteur_Message } = cmd_options;
+    const { arg, auteur_Message, ms} = cmd_options;
     
     if (!arg.length) {
-      return ovl.sendMessage(ms_org, { text: "Veuillez fournir un terme de recherche pour le sticker !" });
+      return ovl.sendMessage(ms_org, { text: "Veuillez fournir un terme de recherche pour le sticker !" }, { quoted: ms });
     }
 
     if (cmd_options.verif_Groupe) {
-      ovl.sendMessage(ms_org, { text: "Pour éviter le spam, les stickers seront envoyés en privé. 📥" });
+      ovl.sendMessage(ms_org, { text: "Pour éviter le spam, les stickers seront envoyés en privé. 📥" }, { quoted: ms });
     }
 
     const tenorApiKey = "AIzaSyCyouca1_KKy4W_MG1xsPzuku5oa8W358c";
@@ -357,7 +357,7 @@ ovlcmd(
       
       const stickers = response.data.results;
       if (!stickers.length) {
-        return ovl.sendMessage(ms_org, { text: "Aucun sticker trouvé pour cette recherche." });
+        return ovl.sendMessage(ms_org, { text: "Aucun sticker trouvé pour cette recherche." }, { quoted: ms });
       }
 
       for (let i = 0; i < Math.min(8, stickers.length); i++) {
@@ -373,11 +373,11 @@ ovlcmd(
         });
 
         const stickerBuffer = await sticker.toBuffer();
-        await ovl.sendMessage(auteur_Message, { sticker: stickerBuffer });
+        await ovl.sendMessage(auteur_Message, { sticker: stickerBuffer },  { quoted: ms });
       }
     } catch (error) {
       console.error(error);
-      ovl.sendMessage(ms_org, { text: "Une erreur s'est produite lors de la récupération des stickers." });
+      ovl.sendMessage(ms_org, { text: "Une erreur s'est produite lors de la récupération des stickers." },  { quoted: ms });
     }
   }
 );
@@ -385,16 +385,16 @@ ovlcmd(
 ovlcmd(
   {
     nom_cmd: "meteo",
-    classe: "search",
+    classe: "Search",
     react: "🌦️",
     desc: "Affiche la météo d'une ville.",
   },
   async (ms_org, ovl, cmd_options) => {
-    const { arg } = cmd_options;
+    const { arg, ms } = cmd_options;
     const cityName = arg.join(" ");
 
     if (!cityName) {
-      return ovl.sendMessage(ms_org, { text: "❗ Veuillez fournir un nom de ville." });
+      return ovl.sendMessage(ms_org, { text: "❗ Veuillez fournir un nom de ville." }, { quoted: ms });
     }
 
     try {
@@ -443,10 +443,10 @@ ovlcmd(
 🌄 *Lever du soleil (GMT) :* ${formattedSunrise}  
 🌅 *Coucher du soleil (GMT) :* ${formattedSunset}`;
 
-      await ovl.sendMessage(ms_org, { text: weatherMessage });
+      await ovl.sendMessage(ms_org, { text: weatherMessage },  { quoted: ms });
     } catch (error) {
       console.error("Erreur lors de la récupération des données météo :", error.message);
-      await ovl.sendMessage(ms_org, { text: "❗ Impossible de trouver cette ville. Vérifiez l'orthographe et réessayez !" });
+      await ovl.sendMessage(ms_org, { text: "❗ Impossible de trouver cette ville. Vérifiez l'orthographe et réessayez !" }, { quoted: ms });
     }
   }
 );
@@ -454,7 +454,7 @@ ovlcmd(
 ovlcmd(
   {
     nom_cmd: "anime",
-    classe: "search",
+    classe: "Search",
     react: "📺",
     desc: "Recherche un anime aléatoire avec un résumé et un lien vers MyAnimeList."
   },
@@ -485,11 +485,11 @@ ovlcmd(
       await ovl.sendMessage(ms_org, {
         image: { url: imageUrl },
         caption: message
-      });
+      }, { quoted: cmd_options.ms });
 
     } catch (error) {
         console.error(error);
-      ovl.sendMessage(ms_org, { text: 'Une erreur est survenue lors de la récupération des informations de l\'anime.' });
+      ovl.sendMessage(ms_org, { text: 'Une erreur est survenue lors de la récupération des informations de l\'anime.' }, { quoted: cmd_options.ms });
     }
   }
 );
@@ -549,24 +549,24 @@ ovlcmd(
 ovlcmd(
     {
         nom_cmd: "ytsearch",
-        classe: "search",
+        classe: "Search",
         react: "🎵",
         desc: "Recherche une chanson depuis YouTube avec un terme de recherche",
         alias: ['yts']
     },
     async (ms_org, ovl, cmd_options) => {
-        const { arg } = cmd_options;
+        const { arg, ms } = cmd_options;
         if (!arg.length) {
             return await ovl.sendMessage(ms_org, {
                 text: "Veuillez spécifier un terme de recherche.",
-            });
+            }, { quoted: ms });
         }
 
         const query = arg.join(" ");
         try {
             const searchResults = await ytsr(query, { limit: 5 });
             if (searchResults.items.length === 0) {
-                return await ovl.sendMessage(ms_org, { text: "Aucun résultat trouvé." });
+                return await ovl.sendMessage(ms_org, { text: "Aucun résultat trouvé." }, { quoted: ms });
             }
 
             const results = searchResults.items.map((item, index) => {
@@ -575,10 +575,10 @@ ovlcmd(
 
             await ovl.sendMessage(ms_org, {
                 text: `╭─── 〔 OVL-MD YTS 〕 ──⬣\n${results}\n╰──────────────────⬣`,
-            });
+            }, { quoted: ms });
         } catch (error) {
             console.error("Erreur YTSearch:", error.message);
-            await ovl.sendMessage(ms_org, { text: "Erreur lors de la recherche." });
+            await ovl.sendMessage(ms_org, { text: "Erreur lors de la recherche." }, { quoted: ms });
         }
     }
 );
@@ -593,7 +593,7 @@ ovlcmd(
     alias: "apks",
   },  
   async (ms_org, ovl, cmd_options) => {
-    const { repondre, arg, ms } = commandeOptions;
+    const { repondre, arg, ms } = cmd_options;
 
     try {
       const appName = arg.join(' ');
@@ -631,9 +631,9 @@ ovlcmd(
     desc: "Télécharge des images depuis Pinterest",
     alias: ["pint"],
   },  
-  async (dest, zk, commandeOptions) => {
+  async (ms_org, ovl, cmd_options) => {
 
-    const { repondre, ms, arg } = commandeOptions;
+    const { repondre, ms, arg } = cmd_options;
 
     if (!arg[0]) {
       repondre('Veuillez fournir un terme de recherche pour Pinterest !');
@@ -667,7 +667,7 @@ ovlcmd(
         }
 
         try {
-          await zk.sendMessage(dest, { image: { url: imageUrl }, caption: `\`\`\`Powered By OVL-MD\`\`\`` }, { quoted: ms });
+          await ovl.sendMessage(ms_org, { image: { url: imageUrl }, caption: `\`\`\`Powered By OVL-MD\`\`\`` }, { quoted: ms });
         } catch (sendError) {
           console.error(`Erreur lors de l'envoi de l'image ${i + 1}:`, sendError);
           repondre(`Erreur lors de l'envoi de l'image ${i + 1}.`);
