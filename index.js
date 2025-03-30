@@ -773,13 +773,13 @@ ovl.ev.on("connection.update", async (con) => {
             for (const msg of messages) {
                 const idSalon = msg.key.remoteJid;
                 const idExpediteur = msg.key.fromMe
-                    ? zk.user.id.replace(/:.*@/g, '@')
+                    ? ovl.user.id.replace(/:.*@/g, '@')
                     : msg.key.participant
                         ? msg.key.participant.replace(/:.*@/g, '@')
                         : idSalon;
 
                 if (idExpediteur === expediteur && idSalon === salon && condition(msg)) {
-                    zk.ev.off('messages.upsert', analyseur);
+                    ovl.ev.off('messages.upsert', analyseur);
                     if (chrono) clearTimeout(chrono);
                     return accepter(msg);
                 }
