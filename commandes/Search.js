@@ -581,3 +581,101 @@ ovlcmd(
         }
     }
 );
+
+
+ovlcmd(
+  {
+    nom_cmd: "apk_search",
+    classe: "Search",
+    react: "🔍",
+    desc: "Rechercher des applications sur Aptoide",
+    alias: "apks",
+  },  
+  async (ms_org, ovl, cmd_options) => {
+    const { repondre, arg, ms } = commandeOptions;
+
+    try {
+      const appName = arg.join(' ');
+      if (!appName) {
+        return repondre("*Veuillez entrer le nom de l'application à rechercher* 🧐");
+      }
+
+      const searchResults = await search(appName);
+
+      if (searchResults.length === 0) {
+        return repondre("*Aucune application trouvée, essayez un autre nom* 😕");
+      }
+
+      // Limiter les résultats aux 10 premiers
+      const limitedResults = searchResults.slice(0, 10);
+
+      let messageText = "*🔍OVL-MD APK-SEARCH:*\n\n";
+      limitedResults.forEach((app, index) => {
+        messageText += `📱 *${index + 1}. Nom:* ${app.name}\n🆔 *ID:* ${app.id}\n📅 *Dernière mise à jour:* ${app.lastup}\n📦 *Taille:* ${app.size}\n\n`;
+      });
+
+      repondre(messageText);
+    } catch (error) {
+      console.error('Erreur lors de la recherche des applications :', error);
+      repondre("*Erreur lors du traitement de la commande apk_search* ⚠️");
+    }
+  }
+);
+
+ovlcmd(
+  {
+    nom_cmd: "pinterest",
+    classe: "Search",
+    react: "〽️",
+    desc: "Télécharge des images depuis Pinterest",
+    alias: ["pint"],
+  },  
+  async (dest, zk, commandeOptions) => {
+
+    const { repondre, ms, arg } = commandeOptions;
+
+    if (!arg[0]) {
+      repondre('Veuillez fournir un terme de recherche pour Pinterest !');
+      return;
+    }
+
+    const searchTerm = arg.join(" ");
+
+    try {
+      const url = `https://itzpire.com/search/pinterest?query=${encodeURIComponent(searchTerm)}`;
+      const { data } = await axios.get(url);
+
+      if (!data || !Array.isArray(data.data)) {
+        repondre("Désolé, aucune image trouvée.");
+        return;
+      }
+
+      const images = data.data.slice(0, 5);
+
+      if (images.length === 0) {
+        repondre("Aucune image trouvée pour cette requête.");
+        return;
+      }
+
+      for (let i = 0; i < images.length; i++) {
+        const imageUrl = images[i];
+
+        if (typeof imageUrl !== 'string' || !imageUrl.startsWith('http')) {
+          console.warn(`URL d'image invalide: ${imageUrl}`);
+          continue;
+        }
+
+        try {
+          await zk.sendMessage(dest, { image: { url: imageUrl }, caption: `\`\`\`Powered By OVL-MD\`\`\`` }, { quoted: ms });
+        } catch (sendError) {
+          console.error(`Erreur lors de l'envoi de l'image ${i + 1}:`, sendError);
+          repondre(`Erreur lors de l'envoi de l'image ${i + 1}.`);
+        }
+      }
+
+    } catch (error) {
+      console.error(error);
+      repondre("Une erreur s'est produite lors de la recherche d'images.");
+    }
+  }
+);
