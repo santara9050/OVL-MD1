@@ -497,7 +497,7 @@ ovlcmd(
         7: 'gc/status'
       };
 
-      const [settings] = await CONF.findOrCreate({
+      const [settings] = await WA_CONF.findOrCreate({
         where: { id: jid },
         defaults: { id: jid, antidelete: 'non' },
       });
@@ -559,7 +559,7 @@ ovlcmd(
       const sousCommande = arg[0]?.toLowerCase();
       const validtypes = ['on', 'off'];
 
-      const [settings] = await CONF.findOrCreate({
+      const [settings] = await WA_CONF.findOrCreate({
         where: { id: jid },
         defaults: { id: jid, antivv: 'non' },
       });
