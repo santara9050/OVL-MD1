@@ -7,6 +7,7 @@ const config = require('../set');
 const { translate } = require('@vitalets/google-translate-api');
 const ytsr = require('@distube/ytsr');
 const LyricsFinder = require('@faouzkk/lyrics-finder');
+const { search, download } = require("aptoide_scrapper_fixed");
 
 ovlcmd(
     {
