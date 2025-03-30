@@ -6,7 +6,7 @@ const config = require('../set');
 const axios = require("axios");
 const { Sticker, StickerTypes } = require("wa-sticker-formatter");
 const cheerio = require('cheerio');
-const { WA_CONF } = require('../DataBase/Wa_conf');
+const { WA_CONF } = require('../DataBase/wa_conf');
 
 ovlcmd(
   {
