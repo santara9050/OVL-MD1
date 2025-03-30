@@ -1,5 +1,5 @@
 const { ovlcmd } = require("../framework/ovlcmd");
-const { WA_CONF } = require('../DataBase/Wa_conf');
+const { WA_CONF } = require('../DataBase/wa_conf');
 
 ovlcmd(
     {
