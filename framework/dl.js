@@ -2,6 +2,47 @@ const axios = require("axios");
 const cheerio = require("cheerio");
 const cookie = require("cookie");
 
+async function ytdl(url, format = 'mp4', maxRetries = 15) {
+  let attempts = 0;
+
+  while (attempts < maxRetries) {
+    try {
+      attempts++;
+      const response = await axios.post(
+        'https://www.clipto.com/api/youtube',
+        { url: url },
+        {
+          headers: {
+            "user-agent": "GoogleBot",
+          }
+        }
+      );
+
+      if (response.data?.success) {
+        const data = response.data;
+        const medias = data.medias?.filter(item => item.extension === format && item.is_audio === true) || [];
+
+        if (medias.length === 0) {
+          throw new Error(`Format ${format} non disponible ou audio non trouvé pour cette vidéo.`);
+        }
+
+        return medias[medias.length - 1].url;
+      } else {
+        throw new Error("Erreur API: " + (response.data?.message || "Réponse invalide"));
+      }
+
+    } catch (error) {
+      console.error("Erreur lors de la récupération des données : ", error.message);
+
+      if (attempts >= maxRetries) {
+        throw new Error("Impossible de récupérer les données après " + maxRetries + " tentatives.");
+      }
+
+      await new Promise(resolve => setTimeout(resolve, 2000));
+    }
+  }
+}
+
 async function fbdl(url, maxRetries = 5) {
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
@@ -18,7 +59,7 @@ async function fbdl(url, maxRetries = 5) {
       );
 
       const $ = cheerio.load(response.data);
-      const firstLink = $('.results-list-item a').first().attr('href');
+      const firstLink = $('.results-list-item a').first().attr('href') || null;
 
       if (!firstLink) {
         throw new Error("❌ Aucun lien MP4 trouvé.");
@@ -198,45 +239,6 @@ async function twitterdl(url, maxRetries = 5) {
   }
 };
 
-async function ytdl(url, format = 'mp4', maxRetries = 15) {
-  let attempts = 0;
-
-  while (attempts < maxRetries) {
-    try {
-      attempts++;
-      const response = await axios.post('https://www.clipto.com/api/youtube', {
-        url: url, {
-        headers: {
-          "user-agent": "GoogleBot",
-        },
-      }
-      });
-      
-      if (response.data.success) {
-        const data = response.data;
-        const medias = data.medias.filter(item => item.extension === format && item.is_audio === true);
-        
-        if (medias.length === 0) {
-          throw new Error(`Format ${format} non disponible ou audio non trouvé pour cette vidéo.`);
-        }
-
-        const media = medias[medias.length - 1];
-        return media.url;
-      } else {
-        throw new Error("Erreur API: " + response.data.message);
-      }
-
-    } catch (error) {
-      console.error("Erreur lors de la récupération des données : ", error.message);
-      
-      if (attempts >= maxRetries) {
-        throw new Error("Impossible de récupérer les données après " + maxRetries + " tentatives.");
-      }
-
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-    }
-  }
-}
 
 module.exports = { fbdl, ttdl, igdl, twitterdl, ytdl };
 
