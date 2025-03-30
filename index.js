@@ -194,7 +194,7 @@ const verif_Admin = verif_Groupe
  // Fin Rank et Level up
  
  const settings = await WA_CONF.findOne({ where: { id: '1' } });
-        if (!settings) return;
+        if (settings) {
 // Présence
 if (settings.presence === 'enligne') {
     await ovl.sendPresenceUpdate("available", ms_org);
@@ -228,7 +228,7 @@ if (ms_org === "status@broadcast" && settings.dl_status === "oui") {
 }
 
 // Anti Vue Unique
-/* if (settings.antivv === "oui") {
+if (settings.antivv === "oui") {
     let viewOnceKey = Object.keys(ms.message).find(key => key.startsWith("viewOnceMessage"));
     let vue_Unique_Message = ms.message;
 
@@ -238,14 +238,11 @@ if (ms_org === "status@broadcast" && settings.dl_status === "oui") {
 
     if (vue_Unique_Message) {
         if (
-            (vue_Unique_Message.imageMessage && vue_Unique_Message.imageMessage.viewOnce !== true) ||
-            (vue_Unique_Message.videoMessage && vue_Unique_Message.videoMessage.viewOnce !== true) ||
-            (vue_Unique_Message.audioMessage && vue_Unique_Message.audioMessage.viewOnce !== true)
+            (vue_Unique_Message.imageMessage && vue_Unique_Message.imageMessage.viewOnce == true) ||
+            (vue_Unique_Message.videoMessage && vue_Unique_Message.videoMessage.viewOnce == true) ||
+            (vue_Unique_Message.audioMessage && vue_Unique_Message.audioMessage.viewOnce == true)
         ) {
-            return;
-        }
-    }
-
+        
     try {
         let media;
         let options = { quoted: ms };
@@ -278,7 +275,10 @@ if (ms_org === "status@broadcast" && settings.dl_status === "oui") {
     } catch (_error) {
         console.error("❌ Erreur lors du traitement du message en vue unique :", _error.message || _error);
     }
- }*/
+}
+     }
+    }
+
 
    //antidelete
  try {
@@ -334,7 +334,7 @@ ${provenance}
 } catch (err) {
     console.error('Une erreur est survenue', err);
 }
-
+        }
  //fin antidelete
  
 //Antitag 
