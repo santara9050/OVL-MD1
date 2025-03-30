@@ -351,3 +351,73 @@ ovlcmd(
     }
 );
 */
+
+ovlcmd(
+    {
+        nom_cmd: "llama",
+        classe: "IA",
+        react: "🤖",
+        desc: "Utilise l'API Llama pour générer des réponses."
+    },
+    async (ms_org, ovl, cmd_options) => {
+        const { arg, ms } = cmd_options;
+
+        // Vérification si l'utilisateur a fourni un prompt
+        if (!arg.length) {
+            return ovl.sendMessage(ms_org, { text: "Veuillez entrer un prompt pour générer une réponse." }, { quoted: ms });
+        }
+
+        const prompt = arg.join(" ");
+        const apiUrl = `https://api.gurusensei.workers.dev/llama?prompt=${encodeURIComponent(prompt)}`;
+
+        try {
+            // Appel à l'API pour obtenir la réponse
+            const result = await axios.get(apiUrl);
+
+            if (result.data && result.data.response) {
+                const responseText = result.data.response.response;
+                return ovl.sendMessage(ms_org, { text: responseText }, { quoted: ms });
+            } else {
+                return ovl.sendMessage(ms_org, { text: "Erreur de réponse de l'API Llama." }, { quoted: ms });
+            }
+        } catch (error) {
+            console.error("Erreur lors de l'appel à l'API Llama :", error);
+            return ovl.sendMessage(ms_org, { text: "Une erreur est survenue lors de l'appel à l'API." }, { quoted: ms });
+        }
+    }
+);
+
+ovlcmd(
+    {
+        nom_cmd: "bard",
+        classe: "IA",
+        react: "🤖",
+        desc: "Faites appel à l'API Bard pour obtenir des réponses."
+    },
+    async (ms_org, ovl, cmd_options) => {
+        const { arg, ms } = cmd_options;
+
+        // Vérification si l'utilisateur a fourni un prompt
+        if (!arg.length) {
+            return ovl.sendMessage(ms_org, { text: "Veuillez entrer un prompt pour générer une réponse." }, { quoted: ms });
+        }
+
+        const prompt = arg.join(" ");
+        const apiUrl = `https://api.diioffc.web.id/api/ai/bard?query=${encodeURIComponent(prompt)}`;
+
+        try {
+            // Appel à l'API pour obtenir la réponse
+            const result = await axios.get(apiUrl);
+
+            if (result.data && result.data.result) {
+                const responseText = result.data.result.message;
+                return ovl.sendMessage(ms_org, { text: responseText }, { quoted: ms });
+            } else {
+                return ovl.sendMessage(ms_org, { text: "Erreur de réponse de l'API Bard." }, { quoted: ms });
+            }
+        } catch (error) {
+            console.error("Erreur lors de l'appel à l'API Bard :", error);
+            return ovl.sendMessage(ms_org, { text: "Une erreur est survenue lors de l'appel à l'API." }, { quoted: ms });
+        }
+    }
+);
