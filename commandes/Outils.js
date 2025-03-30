@@ -134,7 +134,7 @@ ovlcmd(
             }
 
             menu += "> ©2024 OVL-MD WA-BOT";
-            await ovl.sendMessage(ms_org, { image: { url: lien }, caption: menu }, { quoted: cmd_option.ms });
+            await ovl.sendMessage(ms_org, { image: { url: lien }, caption: menu }, { quoted: cmd_options.ms });
         } catch (error) {
             console.error("Erreur lors de la génération du menu :", error);
         }
