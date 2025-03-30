@@ -209,6 +209,7 @@ async function ytdl(url, format = 'mp4', maxRetries = 15) {
         headers: {
           "user-agent": "GoogleBot",
         },
+      }
       });
       
       if (response.data.success) {
