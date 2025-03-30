@@ -18,7 +18,7 @@ const { levels, calculateLevel } = require('./DataBase/levels');
 const { Ranks } = require('./DataBase/rank');
 const { Sudo } = require('./DataBase/sudo');
 const { getMessage, addMessage } = require('./framework/store');
-const { WA_CONF } = require('./DataBase/Wa_conf');
+const { WA_CONF } = require('./DataBase/wa_conf');
 
  async function ovlAuth(session) {
     let sessionId;
