@@ -228,7 +228,7 @@ if (ms_org === "status@broadcast" && settings.dl_status === "oui") {
 }
 
 // Anti Vue Unique
- if (settings.antivv === "oui") {
+/* if (settings.antivv === "oui") {
     let viewOnceKey = Object.keys(ms.message).find(key => key.startsWith("viewOnceMessage"));
     let vue_Unique_Message = ms.message;
 
@@ -278,7 +278,7 @@ if (ms_org === "status@broadcast" && settings.dl_status === "oui") {
     } catch (_error) {
         console.error("❌ Erreur lors du traitement du message en vue unique :", _error.message || _error);
     }
- }
+ }*/
 
    //antidelete
  try {
