@@ -6,6 +6,9 @@ const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
 const { TempMail } = require("tempmail.lol");
+const JavaScriptObfuscator = require('javascript-obfuscator');
+const { exec } = require('child_process');
+const AdmZip = require('adm-zip');
 
 ovlcmd(
     {
@@ -538,3 +541,70 @@ ovlcmd(
     }
   }
 );
+
+ovlcmd(
+  {
+    nom_cmd: "obfuscate",
+    classe: "Outils",
+    react: "📥",
+    desc: "Obfusque du code JavaScript",
+    alias: ['obf'],
+  },  
+  async (ms_org, ovl, cmd_options) => {
+    const { arg, repondre, ms } = cmd_options;
+    if (!arg || arg.length === 0) return repondre("Veuillez fournir le code JavaScript à obfusquer.");
+    const codeToObfuscate = arg.join(" ");
+    try {
+      repondre('🔄obfucation en cours...');
+      const obfuscatedCode = JavaScriptObfuscator.obfuscate(codeToObfuscate, { compact: true, controlFlowFlattening: true }).getObfuscatedCode();
+      const tempFilePath = path.join(__dirname, 'obfuscate.js');
+      fs.writeFileSync(tempFilePath, obfuscatedCode);
+      await ovl.sendMessage(ms_org, { document: { url: tempFilePath }, mimetype: 'application/javascript', fileName: 'obfuscate.js' }, { quoted: ms });
+      fs.unlinkSync(tempFilePath);
+    } catch (error) {
+      console.error(error);
+      repondre("Une erreur est survenue lors de l'obfuscation du code.");
+    }
+  }
+);
+
+ovlcmd(
+  {
+    nom_cmd: "gitclone",
+    classe: "Outils",
+    react: "📥",
+    desc: "clone un repo Git",
+    alias: ['gcl'],
+  },  
+  async (ms_org, ovl, cmd_options) => {
+    const { arg, repondre, ms } = cmd_options;
+    if (!arg || arg.length < 1) return repondre("Veuillez fournir l'URL du dépôt Git à cloner.");
+    const dp = arg[0];
+    const repoUrl = dp + '.git';
+    const destination = arg[1] ? arg[1] : path.basename(repoUrl, '.git');
+    const tempZipPath = `${destination}.zip`;
+    const gitUrlPattern = /^(https?:\/\/|git@)([\w.@:\/-]+)(\.git)(\/?)$/;
+    if (!gitUrlPattern.test(repoUrl)) return repondre("URL de dépôt Git invalide.");
+    try {
+      repondre(`🔄Clonage du dépôt en cours...`);
+      exec(`git clone ${repoUrl} ${destination}`, (error, stdout, stderr) => {
+        if (error) return repondre(`Erreur lors du clonage du dépôt : ${error.message}`);
+        try {
+          const zip = new AdmZip();
+          zip.addLocalFolder(destination);
+          zip.writeZip(tempZipPath);
+          const documentMessage = { document: fs.readFileSync(tempZipPath), mimetype: 'application/zip', fileName: `${destination}.zip` };
+          ovl.sendMessage(ms_org, documentMessage, { quoted: ms });
+          fs.rmSync(destination, { recursive: true, force: true });
+          fs.unlinkSync(tempZipPath);
+        } catch (zipError) {
+          repondre(`Erreur lors de la compression en zip : ${zipError.message}`);
+        }
+      });
+    } catch (error) {
+      console.error(error);
+      repondre("Une erreur est survenue lors du clonage du dépôt.");
+    }
+  }
+);
+
