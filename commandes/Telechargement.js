@@ -2,6 +2,7 @@ const { ovlcmd } = require("../framework/ovlcmd");
 const { fbdl, ttdl, igdl, twitterdl, ytdl } = require("../framework/dl");
 const ytsr = require('@distube/ytsr');
 const axios = require('axios');
+const { search, download } = require("aptoide_scrapper_fixed");
 
 async function sendMedia(ms_org, ovl, url, format, type) {
   try {
@@ -315,6 +316,124 @@ ovlcmd(
     } catch (error) {
       ovl.sendMessage(ms_org, { text: `Erreur: ${error.message}` });
       console.error("Error:", error);
+    }
+  }
+);
+
+ovlcmd(
+  {
+    nom_cmd: "apk",
+    classe: "Telechargement",
+    react: "📥",
+    desc: "Télécharger une application depuis Aptoide",
+  },  
+  async (ms_org, ovl, cmd_options) => {
+    const { repondre, arg, ms } = cmd_options;
+
+    try {
+      const appName = arg.join(' ');
+      if (!appName) {
+        return repondre("*Entrer le nom de l'application à rechercher*");
+      }
+
+      const searchResults = await search(appName);
+
+      if (searchResults.length === 0) {
+        return repondre("*Application non existante, veuillez entrer un autre nom*");
+      }
+
+      const appData = await download(searchResults[0].id);
+      const fileSize = parseInt(appData.size);
+
+      if (isNaN(fileSize)) {
+        return repondre("*Erreur dans la taille du fichier*");
+      }
+
+      if (fileSize > 300) {
+        return repondre("Le fichier dépasse 300 Mo, impossible de le télécharger.");
+      }
+
+      const downloadLink = appData.dllink;
+      const captionText =
+        "『 *ᴏᴠʟ-ᴍᴅ ᴀᴘᴋ-ᴅʟ* 』\n\n*📱ɴᴏᴍ :* " + appData.name +
+        "\n*🆔ɪᴅ :* " + appData["package"] +
+        "\n*📅ʟᴀsᴛ ᴍᴀʜ :* " + appData.lastup +
+        "\n*📦ᴛᴀɪʟʟᴇ :* " + appData.size +
+        "\n";
+
+      const apkFileName = (appData?.["name"] || "Downloader") + ".apk";
+      const filePath = apkFileName;
+
+      const response = await axios.get(downloadLink, { 'responseType': "stream" });
+      const fileWriter = fs.createWriteStream(filePath);
+      response.data.pipe(fileWriter);
+
+      await new Promise((resolve, reject) => {
+        fileWriter.on('finish', resolve);
+        fileWriter.on("error", reject);
+      });
+
+      const documentMessage = {
+        'document': fs.readFileSync(filePath),
+        'mimetype': 'application/vnd.android.package-archive',
+        'fileName': apkFileName
+      };
+
+      ovl.sendMessage(ms_org, { image: { url: appData.icon }, caption: captionText }, { quoted: ms });
+      ovl.sendMessage(ms_org, documentMessage, { quoted: ms });
+
+      fs.unlinkSync(filePath);
+    } catch (error) {
+      console.error('Erreur lors du traitement de la commande apk:', error);
+      repondre("*Erreur lors du traitement de la commande apk*");
+    }
+  }
+);
+
+ovlcmd(
+  {
+    nom_cmd: "pinterest_dl",
+    classe: "Telechargement",
+    react: "📥",
+    desc: "Télécharger une image depuis Pinterest",
+    alias: ['pint_dl'],
+  },  
+  async (ms_org, ovl, cmd_options) => {
+
+    const { arg, repondre, ms } = cmd_options;
+
+    if (!arg || arg.length === 0) {
+      repondre("Veuillez fournir un lien valide de Pinterest.");
+      return;
+    }
+
+    try {
+      const imageUrl = arg[0];
+      const encodedUrl = encodeURIComponent(imageUrl);
+      const url = `https://itzpire.com/download/pinterest?url=${encodedUrl}`;
+
+      const { data } = await axios.get(url);
+
+      if (!data || !data.data || !Array.isArray(data.data.image)) {
+        throw new Error("Aucune image trouvée");
+      }
+
+      const downloadLink = data.data.image[0];
+
+      if (typeof downloadLink !== 'string' || !downloadLink.startsWith('http')) {
+        throw new Error("Lien de téléchargement invalide");
+      }
+
+      try {
+        await ovl.sendMessage(ms_org, { image: { url: downloadLink } }, { quoted: ms });
+      } catch (sendError) {
+        console.error('Erreur lors de l\'envoi de l\'image via URL:', sendError);
+        repondre("Erreur lors de l'envoi de l'image.");
+      }
+
+    } catch (error) {
+      console.error(error);
+      repondre("Une erreur est survenue lors du téléchargement de l'image.");
     }
   }
 );
