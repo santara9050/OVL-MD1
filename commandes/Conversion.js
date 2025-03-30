@@ -663,10 +663,15 @@ ovlcmd(
     encoder.setDelay(500);
     encoder.setQuality(10);
 
-    const colors = ['#FF5733', '#33FF57', '#3357FF', '#FF33F6', '#F6FF33'];
+    const getRandomColor = () => {
+      const r = Math.floor(Math.random() * 256);
+      const g = Math.floor(Math.random() * 256);
+      const b = Math.floor(Math.random() * 256);
+      return `rgb(${r},${g},${b})`;
+    };
 
     for (let i = 0; i < 5; i++) {
-      const color = colors[i % colors.length];
+      const color = getRandomColor();
       const svg = `
         <svg width="500" height="200" xmlns="http://www.w3.org/2000/svg">
           <rect width="500" height="200" fill="black"/>
@@ -683,7 +688,7 @@ ovlcmd(
     const gifBuffer = encoder.out.getData();
 
     let stickerMess = new Sticker(gifBuffer, {
-      pack: arg.join(' ') ? arg.join(' '): nom_Auteur_Message,
+      pack: arg.join(' ') ? arg.join(' ') : nom_Auteur_Message,
       author: "",
       type: StickerTypes.CROPPED,
       quality: 70,
@@ -694,6 +699,7 @@ ovlcmd(
     ovl.sendMessage(ms_org, { sticker: stickerBuffer });
   }
 );
+
 
 ovlcmd(
   {
