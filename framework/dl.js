@@ -11,7 +11,8 @@ async function fbdl(url, maxRetries = 5) {
         payload,
         {
           headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
+            'Content-Type': 'application/x-www-form-urlencoded', 
+            "user-agent": "GoogleBot"
           }
         }
       );
@@ -204,7 +205,10 @@ async function ytdl(url, format = 'mp4', maxRetries = 15) {
     try {
       attempts++;
       const response = await axios.post('https://www.clipto.com/api/youtube', {
-        url: url, 
+        url: url, {
+        headers: {
+          "user-agent": "GoogleBot",
+        },
       });
       
       if (response.data.success) {
