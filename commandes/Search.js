@@ -607,76 +607,29 @@ ovlcmd(
         return repondre("*Aucune application trouvée, essayez un autre nom* 😕");
       }
 
-      // Limiter les résultats aux 10 premiers
       const limitedResults = searchResults.slice(0, 10);
 
+      const appDetails = await Promise.all(
+        limitedResults.map(async (app) => {
+          const appData = await download(app.id);
+          return {
+            name: app.name,
+            id: app.id,
+            lastup: app.lastup,
+            size: appData.size || "Inconnue",
+          };
+        })
+      );
+
       let messageText = "*🔍OVL-MD APK-SEARCH:*\n\n";
-      limitedResults.forEach((app, index) => {
-        messageText += `📱 *${index + 1}. Nom:* ${app.name}\n🆔 *ID:* ${app.id}\n📅 *Dernière mise à jour:* ${app.lastup}\n📦 *Taille:* ${app.size}\n\n`;
+      appDetails.forEach((app, index) => {
+        messageText += `📱 *${index + 1}. Nom:* ${app.name}\n🆔 *ID:* ${app.id}\n📅 *Dernière mise à jour:* ${app.lastup}\n📦 *Taille:* ${app.size} MB\n\n`;
       });
 
       repondre(messageText);
     } catch (error) {
       console.error('Erreur lors de la recherche des applications :', error);
       repondre("*Erreur lors du traitement de la commande apk_search* ⚠️");
-    }
-  }
-);
-
-ovlcmd(
-  {
-    nom_cmd: "pinterest",
-    classe: "Search",
-    react: "〽️",
-    desc: "Télécharge des images depuis Pinterest",
-    alias: ["pint"],
-  },  
-  async (ms_org, ovl, cmd_options) => {
-
-    const { repondre, ms, arg } = cmd_options;
-
-    if (!arg[0]) {
-      repondre('Veuillez fournir un terme de recherche pour Pinterest !');
-      return;
-    }
-
-    const searchTerm = arg.join(" ");
-
-    try {
-      const url = `https://itzpire.com/search/pinterest?query=${encodeURIComponent(searchTerm)}`;
-      const { data } = await axios.get(url);
-
-      if (!data || !Array.isArray(data.data)) {
-        repondre("Désolé, aucune image trouvée.");
-        return;
-      }
-
-      const images = data.data.slice(0, 5);
-
-      if (images.length === 0) {
-        repondre("Aucune image trouvée pour cette requête.");
-        return;
-      }
-
-      for (let i = 0; i < images.length; i++) {
-        const imageUrl = images[i];
-
-        if (typeof imageUrl !== 'string' || !imageUrl.startsWith('http')) {
-          console.warn(`URL d'image invalide: ${imageUrl}`);
-          continue;
-        }
-
-        try {
-          await ovl.sendMessage(ms_org, { image: { url: imageUrl }, caption: `\`\`\`Powered By OVL-MD\`\`\`` }, { quoted: ms });
-        } catch (sendError) {
-          console.error(`Erreur lors de l'envoi de l'image ${i + 1}:`, sendError);
-          repondre(`Erreur lors de l'envoi de l'image ${i + 1}.`);
-        }
-      }
-
-    } catch (error) {
-      console.error(error);
-      repondre("Une erreur s'est produite lors de la recherche d'images.");
     }
   }
 );
