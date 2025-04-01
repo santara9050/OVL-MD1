@@ -115,8 +115,6 @@ async function getRenderCommit() {
   }
 }
 
-const axios = require("axios");
-
 async function getGitCommit() {
   try {
     const response = await axios.get(
