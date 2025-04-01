@@ -358,7 +358,7 @@ ovlcmd(
       const captionText =
         "『 *ᴏᴠʟ-ᴍᴅ ᴀᴘᴋ-ᴅʟ* 』\n\n*📱ɴᴏᴍ :* " + appData.name +
         "\n*🆔ɪᴅ :* " + appData["package"] +
-        "\n*📅ʟᴀsᴛ ᴍᴀʜ :* " + appData.lastup +
+        "\n*📅ᴍɪsᴇ ᴀ̀ ᴊᴏᴜʀ:* " + appData.lastup +
         "\n*📦ᴛᴀɪʟʟᴇ :* " + appData.size +
         "\n";
 
