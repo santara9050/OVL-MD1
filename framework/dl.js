@@ -8,12 +8,36 @@ async function ytdl(url, format = 'mp4', maxRetries = 15) {
   while (attempts < maxRetries) {
     try {
       attempts++;
+      const respo = await axios.get("https://www.clipto.com/fr/tool-downloader", {
+        headers: {
+          "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+          "accept-language": "fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7",
+          "user-agent": "GoogleBot",
+        },
+        maxRedirects: 5,
+      });
+
+
+      const cookies = respo.headers["set-cookie"];
+      const initialCookies = cookies
+        .map(cookieStr => cookie.parse(cookieStr))
+        .reduce((acc, curr) => ({ ...acc, ...curr }), {});
+
+      const sessionCookies = Object.entries({
+        __cfduid: initialCookies.__cfduid || "",
+        PHPSESSID: initialCookies.PHPSESSID || "",
+      })
+        .map(([key, value]) => cookie.serialize(key, value))
+        .join("; ");
+      
       const response = await axios.post(
         'https://www.clipto.com/api/youtube',
         { url: url },
         {
           headers: {
             "user-agent": "GoogleBot",
+            "cookie": sessionCookies,
+
           }
         }
       );
@@ -46,14 +70,15 @@ async function ytdl(url, format = 'mp4', maxRetries = 15) {
 async function fbdl(url, maxRetries = 5) {
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
+      
       const payload = new URLSearchParams({ id: url, locale: 'en' }).toString();
       const response = await axios.post(
         'https://getmyfb.com/process',
         payload,
         {
           headers: {
-            'Content-Type': 'application/x-www-form-urlencoded', 
-            "user-agent": "GoogleBot"
+            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8', 
+            "user-agent": "GoogleBot",
           }
         }
       );
