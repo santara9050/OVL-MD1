@@ -115,14 +115,26 @@ async function getRenderCommit() {
   }
 }
 
+const axios = require("axios");
+
 async function getGitCommit() {
   try {
     const response = await axios.get(
       `https://api.github.com/repos/Ainz-fkk/OVL-MD/commits`,
       {
         headers: {
-          Accept: "application/vnd.github.v3+json",
-           }
+          "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+          "Accept-Encoding": "gzip, deflate, br",
+          "Accept-Language": "fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7",
+          "Sec-Ch-Ua": `"Not A(Brand";v="8", "Chromium";v="132"`,
+          "Sec-Ch-Ua-Mobile": "?1",
+          "Sec-Ch-Ua-Platform": `"Android"`,
+          "Sec-Fetch-Dest": "document",
+          "Sec-Fetch-Mode": "navigate",
+          "Sec-Fetch-Site": "none",
+          "Upgrade-Insecure-Requests": "1",
+          "User-Agent": "GoogleBot"
+        }
       }
     );
 
@@ -137,6 +149,9 @@ async function getGitCommit() {
     throw new Error("Impossible de récupérer le dernier commit depuis GitHub.");
   }
 }
+
+// Test
+getGitCommit().then(console.log).catch(console.error);
 
 async function deployRender() {
   try {
