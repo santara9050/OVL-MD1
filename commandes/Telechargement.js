@@ -7,13 +7,13 @@ const fs = require("fs");
 
 async function sendMedia(ms_org, ovl, url, format, type) {
   try {
-    const downloadLink = await ytdl(url, format);
-    if (!downloadLink) {
+    const downloadLink = await axios.get(`https://glad-atlanta-ovl-9417f8d8.koyeb.app/ovl-yt-dl?url=${url}&format=${format}`);
+    if (!downloadLink.data.url) {
       throw new Error("Le lien de téléchargement est introuvable.");
     }
 
     // Téléchargement des données du fichier
-    const media = await axios.get(downloadLink, {
+    const media = await axios.get(downloadLink.data.url, {
       responseType: "arraybuffer",
       headers: {
         "User-Agent": "GoogleBot",
