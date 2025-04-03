@@ -590,7 +590,7 @@ ovlcmd(
     classe: "Search",
     react: "🔍",
     desc: "Rechercher des applications sur Aptoide",
-    alias: "apks",
+    alias: ["apks"],
   },  
   async (ms_org, ovl, cmd_options) => {
     const { repondre, arg, ms } = cmd_options;
