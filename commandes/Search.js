@@ -615,7 +615,7 @@ ovlcmd(
           return {
             name: app.name,
             id: app.id,
-            lastup: app.lastup,
+            lastup: appData.lastup,
             size: appData.size || "Inconnue",
           };
         })
@@ -623,7 +623,7 @@ ovlcmd(
 
       let messageText = "*🔍OVL-MD APK-SEARCH:*\n\n";
       appDetails.forEach((app, index) => {
-        messageText += `📱 *${index + 1}. Nom:* ${app.name}\n🆔 *ID:* ${app.id}\n📅 *Dernière mise à jour:* ${app.lastup}\n📦 *Taille:* ${app.size} MB\n\n`;
+        messageText += `📱 *${index + 1}. Nom:* ${app.name}\n🆔 *ID:* ${app.id}\n📅 *Dernière mise à jour:* ${app.lastup}\n📦 *Taille:* ${app.size}\n\n`;
       });
 
       repondre(messageText);
