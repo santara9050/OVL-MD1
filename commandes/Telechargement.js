@@ -12,16 +12,8 @@ async function sendMedia(ms_org, ovl, url, format, type) {
       throw new Error("Le lien de téléchargement est introuvable.");
     }
 
-    // Téléchargement des données du fichier
-    const media = await axios.get(downloadLink.data.url, {
-      responseType: "arraybuffer",
-      headers: {
-        "User-Agent": "GoogleBot",
-      },
-    });
-
     const message = {
-      [type]: Buffer.from(media.data),
+      [type]: downloadLink.data.url,
       mimetype: format === "weba" ? "audio/mpeg" : "video/mp4",
       caption: `\`\`\`Powered By OVL-MD\`\`\``
     };
@@ -32,7 +24,6 @@ async function sendMedia(ms_org, ovl, url, format, type) {
     throw error;
   }
 }
-
 
 ovlcmd(
     {
