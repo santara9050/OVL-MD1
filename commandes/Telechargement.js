@@ -323,7 +323,7 @@ ovlcmd(
 
 ovlcmd(
   {
-    nom_cmd: "apk",
+    nom_cmd: "app",
     classe: "Telechargement",
     react: "📥",
     desc: "Télécharger une application depuis Aptoide",
