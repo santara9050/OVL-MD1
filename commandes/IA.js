@@ -75,8 +75,25 @@ ovlcmd(
             return ovl.sendMessage(ms_org, { text: "Veuillez entrer une description pour générer une image." }, { quoted: ms });
         }
 
-        const prompt = arg.join(" ");
-        const apiUrl = "https://nexra.aryahcr.cc/api/image/complements";
+        try {
+            const prompt = encodeURIComponent(arg.join(" ")); // Encodage de l'URL
+            const rep = await axios.get(`https://bk9.fun/ai/fluximg?q=${prompt}`);
+            
+            if (!rep.data?.BK9?.length) {
+                throw new Error("Aucune image trouvée.");
+            }
+
+            const url = rep.data.BK9[0];
+
+            return ovl.sendMessage(ms_org, { image: { url: url }, caption: `\`\`\`Powered By OVL-MD\`\`\`` }, { quoted: ms });
+        } catch (err) {
+            console.error("Erreur lors de la génération de l'image :", err);
+            return ovl.sendMessage(ms_org, { text: "❌ Erreur lors de la génération de l'image. Réessayez plus tard." }, { quoted: ms });
+        }
+    }
+);
+
+      /*  const apiUrl = "https://nexra.aryahcr.cc/api/image/complements";
 
         try {
             const result = await axios.post(apiUrl, {
@@ -114,7 +131,7 @@ ovlcmd(
             return ovl.sendMessage(ms_org, { text: "Une erreur est survenue lors de l'appel à l'API." }, { quoted: ms });
         }
     }
-);
+);*/
 
 ovlcmd(
     {
