@@ -73,7 +73,7 @@ ovlcmd(
             await ovl.sendMessage(ms_org, { text: descriptionMsg }, { quoted: ms });
         } catch (error) {
             console.error("Erreur lors de l'affichage des descriptions :", error.message || error);
-            await ovl.sendMessage(ms_org, { text: "Une erreur s'est produite lors de l'affichage des descriptions." }, { quoted: ms });
+            await ovl.sendMessage(ms_org, { text: "Une erreur s'est produite lors de l'affichage des descriptions." }, { quoted: cmd_options.ms });
         }
     }
 );
