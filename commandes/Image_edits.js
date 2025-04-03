@@ -22,7 +22,7 @@ function genererCommandeCanvacord(nomCommande, effet) {
       desc: "Applique un effet sur une image",
     },
     async (ms_org, ovl, options) => {
-      const { arg, ms, auteur_Msg_Repondu, msg_Repondu } = options;
+      const { arg, ms, auteur_Msg_Repondu, msg_Repondu, auteur_Message } = options;
 
       try {
         let imageBuffer;
