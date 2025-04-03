@@ -115,7 +115,7 @@ async function getRenderCommit() {
   }
 }
 
-function getLastCommit() {
+function getGitCommit() {
   try {
     const lastCommit = execSync("git log -1 --pretty=format:'%h'", {
       cwd: ".",
