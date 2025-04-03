@@ -117,12 +117,10 @@ async function getRenderCommit() {
 
 function getGitCommit() {
   try {
-    const lastCommit = execSync("git log -1 --pretty=format:'%h'", {
+    return execSync("git log -1 --pretty=format:%H", {
       cwd: ".",
       encoding: "utf-8",
     }).trim();
-    
-    return lastCommit;
   } catch (error) {
     console.error("Erreur lors de la récupération du commit:", error.message);
     return null;
