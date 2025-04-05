@@ -5,7 +5,7 @@ const axios = require('axios');
 const { search, download } = require("aptoide_scrapper_fixed");
 const fs = require("fs");
 
-async function sendMedia(ms_org, ovl, url, format, type) {
+async function sendMedia(ms_org, ovl, url, format, type, ms) {
   try {
     const downloadLink = await axios.get(`https://glad-atlanta-ovl-9417f8d8.koyeb.app/ovl-yt-dl?url=${url}&format=${format}`);
     if (!downloadLink.data.url) {
@@ -18,7 +18,7 @@ async function sendMedia(ms_org, ovl, url, format, type) {
       caption: `\`\`\`Powered By OVL-MD\`\`\``
     };
 
-    return await ovl.sendMessage(ms_org, message);
+    return await ovl.sendMessage(ms_org, message, { quoted: ms });
   } catch (error) {
     console.error("Erreur lors de l'envoi du média:", error.message);
     throw error;
@@ -38,14 +38,14 @@ ovlcmd(
         if (!arg.length) {
             return await ovl.sendMessage(ms_org, {
                 text: "Veuillez spécifier un titre de chanson ou un lien YouTube.",
-            });
+            }, { quoted: ms });
         }
 
         const query = arg.join(" ");
         try {
             const searchResults = await ytsr(query, { limit: 1 });
             if (searchResults.items.length === 0) {
-                return await ovl.sendMessage(ms_org, { text: "Aucun résultat trouvé." });
+                return await ovl.sendMessage(ms_org, { text: "Aucun résultat trouvé." }, { quoted: ms });
             }
 
             const song = searchResults.items[0];
@@ -59,12 +59,12 @@ ovlcmd(
 
             const caption = `╭─── 〔 OVL-MD SONG 〕 ──⬣\n⬡ Titre: ${videoInfo.title}\n⬡ URL: ${videoInfo.url}\n⬡ Vues: ${videoInfo.views}\n⬡ Durée: ${videoInfo.duration}\n╰───────────────────⬣`;
 
-            await ovl.sendMessage(ms_org, { image: { url: videoInfo.thumbnail }, caption });
+            await ovl.sendMessage(ms_org, { image: { url: videoInfo.thumbnail }, caption }, { quoted: ms });
 
-            await sendMedia(ms_org, ovl, videoInfo.url, "weba", "audio");
+            await sendMedia(ms_org, ovl, videoInfo.url, "weba", "audio", ms);
         } catch (error) {
             console.error("Erreur Song Downloader:", error.message);
-            await ovl.sendMessage(ms_org, { text: "Erreur lors du téléchargement." });
+            await ovl.sendMessage(ms_org, { text: "Erreur lors du téléchargement." }, { quoted: ms });
         }
     }
 );
@@ -82,14 +82,14 @@ ovlcmd(
         if (!arg.length) {
             return await ovl.sendMessage(ms_org, {
                 text: "Veuillez spécifier un titre de vidéo ou un lien YouTube.",
-            });
+            }, { quoted: ms });
         }
 
         const query = arg.join(" ");
         try {
             const searchResults = await ytsr(query, { limit: 1 });
             if (searchResults.items.length === 0) {
-                return await ovl.sendMessage(ms_org, { text: "Aucun résultat trouvé pour cette recherche." });
+                return await ovl.sendMessage(ms_org, { text: "Aucun résultat trouvé pour cette recherche." }, { quoted: ms });
             }
 
             const video = searchResults.items[0];
@@ -106,12 +106,12 @@ ovlcmd(
             await ovl.sendMessage(ms_org, {
                 image: { url: videoInfo.thumbnail },
                 caption: caption,
-            });
-            await sendMedia(ms_org, ovl, video.url, "mp4", "video");
+            }, { quoted: ms });
+            await sendMedia(ms_org, ovl, video.url, "mp4", "video", ms);
         } catch (error) {
             await ovl.sendMessage(ms_org, {
                 text: "Une erreur est survenue lors du traitement de votre commande.",
-            });
+            }, { quoted: ms });
         }
     }
 );
@@ -126,18 +126,18 @@ ovlcmd(
     alias: ["ytmp3"],
   },
   async (ms_org, ovl, cmd_options) => {
-    const { arg } = cmd_options;
+    const { arg, ms } = cmd_options;
     const videoLink = arg.join(" ");
     if (!videoLink) {
       return ovl.sendMessage(ms_org, {
         text: "Veuillez fournir un lien vidéo YouTube, par exemple : yta https://www.youtube.com/watch?v=abcd1234",
-      });
+      }, { quoted: ms });
     }
 
     try {
-      await sendMedia(ms_org, ovl, videoLink, "weba", "audio");
+      await sendMedia(ms_org, ovl, videoLink, "weba", "audio", ms);
     } catch (error) {
-      ovl.sendMessage(ms_org, { text: `Erreur: ${error.message}` });
+      ovl.sendMessage(ms_org, { text: `Erreur: ${error.message}` }, { quoted: ms });
     }
   }
 );
@@ -152,18 +152,18 @@ ovlcmd(
     alias: ["ytmp4"],
   },
   async (ms_org, ovl, cmd_options) => {
-    const { arg } = cmd_options;
+    const { arg, ms } = cmd_options;
     const videoLink = arg.join(" ");
     if (!videoLink) {
       return ovl.sendMessage(ms_org, {
         text: "Veuillez fournir un lien vidéo YouTube, par exemple : ytv https://www.youtube.com/watch?v=abcd1234",
-      });
+      }, { quoted: ms });
     }
 
     try {
-      await sendMedia(ms_org, ovl, videoLink, "mp4", "video");
+      await sendMedia(ms_org, ovl, videoLink, "mp4", "video", ms);
     } catch (error) {
-      ovl.sendMessage(ms_org, { text: `Erreur: ${error.message}` });
+      ovl.sendMessage(ms_org, { text: `Erreur: ${error.message}` }, { quoted: ms });
     }
   }
 );
@@ -176,11 +176,11 @@ ovlcmd(
     desc: "Télécharger ou envoyer directement une vidéo depuis Facebook en HD"
   },
   async (ms_org, ovl, cmd_options) => {
-    const { arg } = cmd_options;
+    const { arg, ms } = cmd_options;
     const videoLink = arg.join(" ");
     
     if (!videoLink) {
-      return ovl.sendMessage(ms_org, { text: "Veuillez fournir un lien vidéo, par exemple : fbdl https://www.facebook.com/video-link" });
+      return ovl.sendMessage(ms_org, { text: "Veuillez fournir un lien vidéo, par exemple : fbdl https://www.facebook.com/video-link" }, { quoted: ms });
     }
 
     try {
@@ -188,12 +188,12 @@ ovlcmd(
       const response = await axios.get(videoDownloadLink, { responseType: 'arraybuffer' });
       const videoBuffer = Buffer.from(response.data);
 
-      return ovl.sendMessage(ms_org, { video: videoBuffer, caption: `\`\`\`Powered By OVL-MD\`\`\`` });
+      return ovl.sendMessage(ms_org, { video: videoBuffer, caption: `\`\`\`Powered By OVL-MD\`\`\`` }, { quoted: ms });
 
     } catch (error) {
-      ovl.sendMessage(ms_org, { text: `Erreur: ${error.message}` });
+      ovl.sendMessage(ms_org, { text: `Erreur: ${error.message}` }, { quoted: ms });
       console.error('Error:', error);
-      return ovl.sendMessage(ms_org, { text: `Erreur: ${error.message}` });
+      return ovl.sendMessage(ms_org, { text: `Erreur: ${error.message}` }, { quoted: ms });
     }
   }
 );
@@ -206,11 +206,11 @@ ovlcmd(
     desc: "Télécharger ou envoyer directement une vidéo depuis TikTok"
   },
   async (ms_org, ovl, cmd_options) => {
-    const { arg } = cmd_options;
+    const { arg, ms } = cmd_options;
     const videoLink = arg.join(" ");
     
     if (!videoLink) {
-      return ovl.sendMessage(ms_org, { text: "Veuillez fournir un lien vidéo TikTok, par exemple : ttdl https://vm.tiktok.com/ZMkr2TbuQ/" });
+      return ovl.sendMessage(ms_org, { text: "Veuillez fournir un lien vidéo TikTok, par exemple : ttdl https://vm.tiktok.com/..." }, { quoted: ms });
     }
 
     try {
@@ -225,10 +225,10 @@ ovlcmd(
         },
       });
 
-      return ovl.sendMessage(ms_org, { video: Buffer.from(video.data), caption: `\`\`\`Powered By OVL-MD\`\`\`` });
+      return ovl.sendMessage(ms_org, { video: Buffer.from(video.data), caption: `\`\`\`Powered By OVL-MD\`\`\`` }, { quoted: ms });
 
     } catch (error) {
-      ovl.sendMessage(ms_org, { text: `Erreur: ${error}` });
+      ovl.sendMessage(ms_org, { text: `Erreur: ${error}` }, { quoted: ms });
       console.error('Error:', error);
     }
   }
@@ -242,13 +242,13 @@ ovlcmd(
     desc: "Télécharger ou envoyer directement une vidéo depuis Instagram",
   },
   async (ms_org, ovl, cmd_options) => {
-    const { arg } = cmd_options;
+    const { arg, ms } = cmd_options;
     const videoLink = arg.join(" ");
 
     if (!videoLink) {
       return ovl.sendMessage(ms_org, {
-        text: "Veuillez fournir un lien vidéo Instagram, par exemple : igdl https://www.instagram.com/reel/DDxRhkxPyNc/",
-      });
+        text: "Veuillez fournir un lien vidéo Instagram, par exemple : igdl https://www.instagram.com/reel/...",
+      }, { quoted: ms });
     }
     try {
       const downloadLinks = await igdl(videoLink);
@@ -264,9 +264,9 @@ ovlcmd(
       return ovl.sendMessage(ms_org, {
         video: Buffer.from(video.data),
         caption: `\`\`\`Powered By OVL-MD\`\`\``
-      });
+      }, { quoted: ms });
     } catch (error) {
-      ovl.sendMessage(ms_org, { text: `Erreur: ${error.message}` });
+      ovl.sendMessage(ms_org, { text: `Erreur: ${error.message}` }, { quoted: ms });
       console.error("Error:", error);
     }
   }
@@ -280,13 +280,13 @@ ovlcmd(
     desc: "Télécharger ou envoyer directement une vidéo depuis Twitter",
   },
   async (ms_org, ovl, cmd_options) => {
-    const { arg } = cmd_options;
+    const { arg, ms } = cmd_options;
     const videoLink = arg.join(" ");
 
     if (!videoLink) {
       return ovl.sendMessage(ms_org, {
-        text: "Veuillez fournir un lien vidéo Twitter, par exemple : twitterdl https://twitter.com/username/status/1234567890",
-      });
+        text: "Veuillez fournir un lien vidéo Twitter, par exemple : twitterdl https://twitter.com/...",
+      }, { quoted: ms });
     }
 
     try {
@@ -304,9 +304,9 @@ ovlcmd(
       return ovl.sendMessage(ms_org, {
         video: Buffer.from(video.data),
         caption: `\`\`\`Powered By OVL-MD\`\`\``
-      });
+      }, { quoted: ms });
     } catch (error) {
-      ovl.sendMessage(ms_org, { text: `Erreur: ${error.message}` });
+      ovl.sendMessage(ms_org, { text: `Erreur: ${error.message}` }, { quoted: ms });
       console.error("Error:", error);
     }
   }
