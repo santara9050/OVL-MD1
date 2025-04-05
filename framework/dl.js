@@ -70,32 +70,28 @@ async function ytdl(url, format = 'mp4', maxRetries = 15) {
 async function fbdl(url, maxRetries = 5) {
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
-      
       const payload = new URLSearchParams({ id: url, locale: 'en' }).toString();
+
       const response = await axios.post(
         'https://getmyfb.com/process',
         payload,
         {
           headers: {
-            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8', 
-            "user-agent": "GoogleBot",
+            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+            'User-Agent': 'GoogleBot'
           }
         }
       );
 
       const $ = cheerio.load(response.data);
-      const firstLink = $('.results-list-item a').first().attr('href') || null;
+      const firstLink = $('.results-list-item a[href*=".mp4"]').first().attr('href') || null;
 
-      if (!firstLink) {
-        throw new Error("❌ Aucun lien MP4 trouvé.");
-      }
+      if (!firstLink) throw new Error("❌ Aucun lien MP4 trouvé.");
 
       return firstLink;
     } catch (error) {
       console.log(`⚠️ Tentative ${attempt} échouée: ${error.message}`);
-      if (attempt === maxRetries) {
-        throw error;
-      }
+      if (attempt === maxRetries) throw error;
       await new Promise(resolve => setTimeout(resolve, 2000));
     }
   }
