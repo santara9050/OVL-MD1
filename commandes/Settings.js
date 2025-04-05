@@ -238,7 +238,7 @@ ovlcmd(
     const key = arg[0];
     const result = await manageEnvVar("delvar", key);
     await ovl.sendMessage(ms_org, {
-      text: resul
+      text: result
        }, { quoted: ms });
     const restartResult = await restartRenderService();
     await ovl.sendMessage(ms_org, {
