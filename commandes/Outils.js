@@ -19,7 +19,7 @@ ovlcmd(
     },
     async (ms_org, ovl, cmd_options) => {
         try {
-            const mess = `🌐 Bienvenue sur *OVL-MD*, votre bot WhatsApp multi-device.🔍 Tapez *${prefixe}menu* pour voir toutes les commandes disponibles.\n> ©2024 OVL-MD By *AINZ*`;
+            const mess = `🌐 Bienvenue sur *OVL-MD*, votre bot WhatsApp multi-device.🔍 Tapez *${prefixe}menu* pour voir toutes les commandes disponibles.\n> ©2025 OVL-MD By *AINZ*`;
             const img = 'https://telegra.ph/file/8173c870f9de5570db8c3.jpg';
             await ovl.sendMessage(ms_org, { 
                 image: { url: img }, 
@@ -133,7 +133,7 @@ ovlcmd(
                 menu += `╰═══════════════⊷\n\n`;
             }
 
-            menu += "> ©2024 OVL-MD WA-BOT";
+            menu += "> ©2025 OVL-MD WA-BOT";
             await ovl.sendMessage(ms_org, { image: { url: lien }, caption: menu }, { quoted: cmd_options.ms });
         } catch (error) {
             console.error("Erreur lors de la génération du menu :", error);
