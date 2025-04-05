@@ -16,24 +16,24 @@ ovlcmd(
     desc: "Exécute une commande shell sur le serveur"
   },
   async (ms_org, ovl, cmd_options) => {
-    const { arg, prenium_id } = cmd_options;
+    const { arg, prenium_id, ms } = cmd_options;
 
     if (!prenium_id) {
-      return ovl.sendMessage(ms_org, { text: "Vous n'avez pas l'autorisation d'exécuter des commandes." });
+      return ovl.sendMessage(ms_org, { text: "Vous n'avez pas l'autorisation d'exécuter des commandes." }, { quoted: ms });
     }
 
     if (!arg[0]) {
-      return ovl.sendMessage(ms_org, { text: "Veuillez fournir une commande shell à exécuter." });
+      return ovl.sendMessage(ms_org, { text: "Veuillez fournir une commande shell à exécuter." }, { quoted: ms });
     }
 
     exec(arg.join(" "), (err, stdout, stderr) => {
       if (err) {
-        return ovl.sendMessage(ms_org, { text: `Erreur d'exécution: ${err.message}` });
+        return ovl.sendMessage(ms_org, { text: `Erreur d'exécution: ${err.message}` }, { quoted: ms });
       }
       if (stderr) {
-        return ovl.sendMessage(ms_org, { text: `Erreur: ${stderr}` });
+        return ovl.sendMessage(ms_org, { text: `Erreur: ${stderr}` }, { quoted: ms });
       }
-      ovl.sendMessage(ms_org, { text: `Resultat: \n${stdout}` });
+      ovl.sendMessage(ms_org, { text: `Resultat: \n${stdout}` }, { quoted: ms });
     });
   }
 );
@@ -46,13 +46,13 @@ ovlcmd(
     desc: "Exécute du code JavaScript sur le serveur"
   },
   async (ms_org, ovl, cmd_options) => {
-    const { arg, prenium_id } = cmd_options;
+    const { arg, prenium_id, ms } = cmd_options;
 
     if (!prenium_id) {
-      return ovl.sendMessage(ms_org, { text: "Vous n'avez pas le droit d'exécuter cette commande." });
+      return ovl.sendMessage(ms_org, { text: "Vous n'avez pas le droit d'exécuter cette commande." }, { quoted: ms });
     }
     if (!arg[0]) {
-      return ovl.sendMessage(ms_org, { text: "Veuillez fournir du code JavaScript à exécuter." });
+      return ovl.sendMessage(ms_org, { text: "Veuillez fournir du code JavaScript à exécuter." }, { quoted: ms });
     }
 
     try {
@@ -60,9 +60,9 @@ ovlcmd(
       if (typeof result === "object") {
         result = JSON.stringify(result);
       }
-      ovl.sendMessage(ms_org, { text: `Résultat: \n${result}` });
+      ovl.sendMessage(ms_org, { text: `Résultat: \n${result}` }, { quoted: ms });
     } catch (err) {
-      return ovl.sendMessage(ms_org, { text: `Erreur lors de l'exécution du code JavaScript: ${err.message}` });
+      return ovl.sendMessage(ms_org, { text: `Erreur lors de l'exécution du code JavaScript: ${err.message}` }, { quoted: ms });
     }
   }
 );
@@ -75,11 +75,11 @@ ovlcmd(
     desc: "Bannir un utilisateur des commandes du bot",
   },
   async (jid, ovl, cmd_options) => {
-    const { repondre, arg, auteur_Msg_Repondu, prenium_id, dev_num } = cmd_options;
+    const { repondre, ms, arg, auteur_Msg_Repondu, prenium_id, dev_num } = cmd_options;
 
     try {
       if (!prenium_id) {
-        return ovl.sendMessage(ms_org, { text: "Vous n'avez pas le droit d'exécuter cette commande." });
+        return ovl.sendMessage(ms_org, { text: "Vous n'avez pas le droit d'exécuter cette commande." }, { quoted: ms });
       }
       const cible =
         auteur_Msg_Repondu || 
@@ -88,7 +88,7 @@ ovlcmd(
       if (!cible) return repondre("Mentionnez un utilisateur valide à bannir.");
 
       if (dev_num.includes(cible)) {
-      return ovl.sendMessage(jid, { text: "Vous ne pouvez pas bannir un développeur." });
+      return ovl.sendMessage(jid, { text: "Vous ne pouvez pas bannir un développeur." }, { quoted: ms });
       }
       const [ban] = await Bans.findOrCreate({
         where: { id: cible },
@@ -99,7 +99,7 @@ ovlcmd(
       return ovl.sendMessage(jid, { 
         text: `Utilisateur @${cible.split('@')[0]} banni avec succès.`, 
         mentions: [cible]
-      });
+      }, { quoted: ms });
     } catch (error) {
       console.error("Erreur lors de l'exécution de la commande ban :", error);
       return repondre("Une erreur s'est produite.");
@@ -115,11 +115,11 @@ ovlcmd(
     desc: "Débannir un utilisateur des commandes du bot",
   },
   async (jid, ovl, cmd_options) => {
-    const { repondre, arg, auteur_Msg_Repondu, prenium_id } = cmd_options;
+    const { repondre, arg, auteur_Msg_Repondu, prenium_id, ms } = cmd_options;
 
     try {
       if (!prenium_id) {
-        return ovl.sendMessage(ms_org, { text: "Vous n'avez pas le droit d'exécuter cette commande." });
+        return ovl.sendMessage(ms_org, { text: "Vous n'avez pas le droit d'exécuter cette commande." }, { quoted: ms });
       }
       const cible =
         auteur_Msg_Repondu || 
@@ -132,7 +132,7 @@ ovlcmd(
       return ovl.sendMessage(jid, { 
         text: `Utilisateur @${cible.split('@')[0]} débanni avec succès.`, 
         mentions: [cible]
-      });
+      }, { quoted: ms });
     } catch (error) {
       console.error("Erreur lors de l'exécution de la commande debannir :", error);
       return repondre("Une erreur s'est produite.");
@@ -148,11 +148,11 @@ ovlcmd(
     desc: "Bannir un groupe des commandes du bot",
   },
   async (jid, ovl, cmd_options) => {
-    const { repondre, arg, verif_Groupe, prenium_id } = cmd_options;
+    const { repondre, arg, verif_Groupe, prenium_id, ms } = cmd_options;
 
     try {
       if (!prenium_id) {
-        return ovl.sendMessage(ms_org, { text: "Vous n'avez pas le droit d'exécuter cette commande." });
+        return ovl.sendMessage(ms_org, { text: "Vous n'avez pas le droit d'exécuter cette commande." }, { quoted: ms });
       }
       if (!verif_Groupe) return repondre("Cette commande fonctionne uniquement dans les groupes.");
 
@@ -182,11 +182,11 @@ ovlcmd(
     desc: "Débannir un groupe des commandes du bot",
   },
   async (jid, ovl, cmd_options) => {
-    const { repondre, arg, verif_Groupe, prenium_id } = cmd_options;
+    const { repondre, arg, verif_Groupe, prenium_id, ms } = cmd_options;
 
     try {
       if (!prenium_id) {
-        return ovl.sendMessage(ms_org, { text: "Vous n'avez pas le droit d'exécuter cette commande." });
+        return ovl.sendMessage(ms_org, { text: "Vous n'avez pas le droit d'exécuter cette commande." }, { quoted: ms });
       }
       if (!verif_Groupe) return repondre("Cette commande fonctionne uniquement dans les groupes.");
 
@@ -212,10 +212,10 @@ ovlcmd(
     desc: "Ajoute un utilisateur dans la liste des utilisateurs premium.",
   },
   async (ms_org, ovl, cmd_options) => {
-    const { repondre, arg, auteur_Msg_Repondu, prenium_id } = cmd_options;
+    const { repondre, arg, auteur_Msg_Repondu, prenium_id, ms } = cmd_options;
 
     if (!prenium_id) {
-      return ovl.sendMessage(ms_org, { text: "Vous n'avez pas le droit d'exécuter cette commande." });
+      return ovl.sendMessage(ms_org, { text: "Vous n'avez pas le droit d'exécuter cette commande." }, { quoted: ms });
     }
     const cible =
       auteur_Msg_Repondu ||
@@ -235,13 +235,13 @@ ovlcmd(
         return ovl.sendMessage(ms_org, { 
         text: `L'utilisateur @${cible.split('@')[0]} est déjà un utilisateur premium.`, 
         mentions: [cible]
-      });
+      }, { quoted: ms });
       }
 
       return ovl.sendMessage(ms_org, { 
         text: `Utilisateur @${cible.split('@')[0]} ajouté avec succès en tant qu'utilisateur premium.`, 
         mentions: [cible]
-      });
+      }, { quoted: ms });
       } catch (error) {
       console.error("Erreur lors de l'exécution de la commande setsudo :", error);
       return repondre("Une erreur est survenue lors de l'ajout de l'utilisateur en premium.");
@@ -257,10 +257,10 @@ ovlcmd(
     desc: "Affiche la liste des utilisateurs premium.",
   },
   async (ms_org, ovl, cmd_options) => {
-    const { repondre, prenium_id } = cmd_options;
+    const { repondre, prenium_id, ms } = cmd_options;
 
     if (!prenium_id) {
-      return ovl.sendMessage(ms_org, { text: "Vous n'avez pas la permission d'exécuter cette commande." });
+      return ovl.sendMessage(ms_org, { text: "Vous n'avez pas la permission d'exécuter cette commande." }, { quoted: ms });
     }
 
     try {
@@ -276,7 +276,7 @@ ovlcmd(
 
       const message = `✨ *Liste des utilisateurs Premium* ✨\n\n*Total*: ${sudoUsers.length}\n\n${userList}`;
 
-      return ovl.sendMessage(ms_org, { text: message, mentions: sudoUsers.map(user => user.id) });
+      return ovl.sendMessage(ms_org, { text: message, mentions: sudoUsers.map(user => user.id) }, { quoted: ms });
     } catch (error) {
       console.error("Erreur lors de l'exécution de la commande sudolist :", error);
       return repondre("Une erreur est survenue lors de l'affichage de la liste des utilisateurs premium.");
@@ -292,10 +292,10 @@ ovlcmd(
     desc: "Supprime un utilisateur de la liste des utilisateurs premium.",
   },
   async (ms_org, ovl, cmd_options) => {
-    const { repondre, arg, auteur_Msg_Repondu, prenium_id } = cmd_options;
+    const { repondre, arg, auteur_Msg_Repondu, prenium_id, ms } = cmd_options;
     
     if (!prenium_id) {
-      return ovl.sendMessage(ms_org, { text: "Vous n'avez pas le droit d'exécuter cette commande." });
+      return ovl.sendMessage(ms_org, { text: "Vous n'avez pas le droit d'exécuter cette commande." }, { quoted: ms });
     }
     const cible =
       auteur_Msg_Repondu ||
@@ -312,13 +312,13 @@ ovlcmd(
         return ovl.sendMessage(ms_org, { 
         text: `L'utilisateur @${cible.split('@')[0]} n'est pas un utilisateur premium.`, 
         mentions: [cible]
-      });
+      }, { quoted: ms });
       }
 
         return ovl.sendMessage(ms_org, { 
         text: `Utilisateur @${cible.split('@')[0]} supprimé avec succès de la liste premium.`, 
         mentions: [cible]
-      });
+      }, { quoted: ms });
     } catch (error) {
       console.error("Erreur lors de l'exécution de la commande delsudo :", error);
       return repondre("Une erreur est survenue lors de la suppression de l'utilisateur de la liste premium.");
@@ -334,7 +334,7 @@ ovlcmd(
         desc: "Importe des stickers Telegram sur WhatsApp",
     },
     async (ms_org, ovl, cmd_options) => {
-        const { repondre, arg, prenium_id } = cmd_options;
+        const { repondre, arg, prenium_id, ms } = cmd_options;
 
          if (!prenium_id) {
       return ovl.sendMessage(ms_org, { text: "Vous n'avez pas le droit d'exécuter cette commande." });
@@ -381,7 +381,7 @@ ovlcmd(
 
                 await ovl.sendMessage(ms_org, {
                     sticker: await sticker.toBuffer(),
-                });
+                }, { quoted: ms });
             }
 
             repondre("Tous les stickers ont été envoyés.");
@@ -400,17 +400,17 @@ ovlcmd(
     desc: "Extrait les données d'une page web, y compris HTML, CSS, JavaScript et médias",
   },
   async (ms_org, ovl, cmd_options) => {
-    const { arg, prenium_id } = cmd_options;
+    const { arg, prenium_id, ms } = cmd_options;
     const lien = arg[0];
 if (!prenium_id) {
-      return ovl.sendMessage(ms_org, { text: "Vous n'avez pas le droit d'exécuter cette commande." });
+      return ovl.sendMessage(ms_org, { text: "Vous n'avez pas le droit d'exécuter cette commande." }, { quoted: ms });
 }
     if (!lien) {
-      return ovl.sendMessage(ms_org, { text: "Veuillez fournir un lien valide. Le bot extraira le HTML, CSS, JavaScript, et les médias de la page web." });
+      return ovl.sendMessage(ms_org, { text: "Veuillez fournir un lien valide. Le bot extraira le HTML, CSS, JavaScript, et les médias de la page web." }, { quoted: ms });
     }
 
     if (!/^https?:\/\//i.test(lien)) {
-      return ovl.sendMessage(ms_org, { text: "Veuillez fournir une URL valide commençant par http:// ou https://" });
+      return ovl.sendMessage(ms_org, { text: "Veuillez fournir une URL valide commençant par http:// ou https://" }, { quoted: ms });
     }
 
     try {
@@ -436,37 +436,37 @@ if (!prenium_id) {
         if (src) fichiersJS.push(src);
       });
 
-      await ovl.sendMessage(ms_org, { text: `**Contenu HTML**:\n\n${html}` });
+      await ovl.sendMessage(ms_org, { text: `**Contenu HTML**:\n\n${html}` }, { quoted: ms });
 
       if (fichiersCSS.length > 0) {
         for (const fichierCSS of fichiersCSS) {
           const cssResponse = await axios.get(new URL(fichierCSS, lien));
           const cssContent = cssResponse.data;
-          await ovl.sendMessage(ms_org, { text: `**Contenu du fichier CSS**:\n\n${cssContent}` });
+          await ovl.sendMessage(ms_org, { text: `**Contenu du fichier CSS**:\n\n${cssContent}` }, { quoted: ms });
         }
       } else {
-        await ovl.sendMessage(ms_org, { text: "Aucun fichier CSS externe trouvé." });
+        await ovl.sendMessage(ms_org, { text: "Aucun fichier CSS externe trouvé." }, { quoted: ms });
       }
 
       if (fichiersJS.length > 0) {
         for (const fichierJS of fichiersJS) {
           const jsResponse = await axios.get(new URL(fichierJS, lien));
           const jsContent = jsResponse.data;
-          await ovl.sendMessage(ms_org, { text: `**Contenu du fichier JavaScript**:\n\n${jsContent}` });
+          await ovl.sendMessage(ms_org, { text: `**Contenu du fichier JavaScript**:\n\n${jsContent}` }, { quoted: ms });
         }
       } else {
-        await ovl.sendMessage(ms_org, { text: "Aucun fichier JavaScript externe trouvé." });
+        await ovl.sendMessage(ms_org, { text: "Aucun fichier JavaScript externe trouvé." }, { quoted: ms });
       }
 
       if (fichiersMedia.length > 0) {
-        await ovl.sendMessage(ms_org, { text: `**Fichiers médias trouvés**:\n${fichiersMedia.join('\n')}` });
+        await ovl.sendMessage(ms_org, { text: `**Fichiers médias trouvés**:\n${fichiersMedia.join('\n')}` }, { quoted: ms });
       } else {
-        await ovl.sendMessage(ms_org, { text: "Aucun fichier média (images, vidéos, audios) trouvé." });
+        await ovl.sendMessage(ms_org, { text: "Aucun fichier média (images, vidéos, audios) trouvé." }, { quoted: ms });
       }
 
     } catch (error) {
       console.error(error);
-      return ovl.sendMessage(ms_org, { text: "Une erreur est survenue lors de l'extraction du contenu de la page web." });
+      return ovl.sendMessage(ms_org, { text: "Une erreur est survenue lors de l'extraction du contenu de la page web." }, { quoted: ms });
     }
   }
 );
