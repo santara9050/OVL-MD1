@@ -663,7 +663,6 @@ ovlcmd(
 );
 
 
-
 ovlcmd(
   {
     nom_cmd: "support",
@@ -673,26 +672,15 @@ ovlcmd(
   },
   async (ms_org, ovl, cmd_options) => {
     const { verif_Groupe, repondre, auteur_msg, ms } = cmd_options;
- 
-    const groupJid = '120363314687943170@g.us';
-    const inviteCode = 'HzhikAmOuYhFXGLmcyMo62';
-    const groupName = 'OVL-MD support group';
 
-    const groupInviteMessage = {
-      groupInviteMessage: {
-        groupJid,
-        inviteCode,
-        inviteExpiration: Math.floor(Date.now() / 1000) + 7 * 24 * 60 * 60,
-        groupName,
-        caption: 'OVL-MD SUPPORT'
-      },
-    };
+    const inviteLink = 'https://chat.whatsapp.com/HzhikAmOuYhFXGLmcyMo62';
+    const message = `📩 *OVL-MD SUPPORT*\nVoici le lien pour rejoindre le groupe:\n${inviteLink}`;
 
     if (verif_Groupe) {
       await repondre("📩 Le lien d'invitation a été envoyé en message privé.");
-      await ovl.sendMessage(auteur_msg, groupInviteMessage, { quoted: ms });
+      await ovl.sendMessage(auteur_msg, { text: message }, { quoted: ms });
     } else {
-      await ovl.sendMessage(ms_org, groupInviteMessage, { quoted: ms });
+      await ovl.sendMessage(ms_org, { text: message }, { quoted: ms });
     }
   }
 );
