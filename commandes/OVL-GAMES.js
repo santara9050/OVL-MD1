@@ -1,4 +1,5 @@
 const { ovlcmd } = require("../framework/ovlcmd");
+const config = require('../set');
 let activeGames = {};
 
 ovlcmd(
@@ -54,9 +55,7 @@ ovlcmd(
                 limiteTemps: 60000
             });
 
-            if (rep.message.conversation.toLowerCase() !== 'oui') {
-                return ovl.sendMessage(ms_org, { text: 'Invitation refusée' }, { quoted: ms });
-            }
+            if (rep.message.conversation.toLowerCase() === 'oui' || rep.message.extendedTextMessage.text.toLowerCase() === 'oui') {          
 
             let grid = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣'];
             let currentPlayer = 0;
@@ -100,7 +99,7 @@ ${grid[6]}   ${grid[7]}   ${grid[8]}
                         salon: ms_org,
                         limiteTemps: 60000
                     });
-                    let response = rep.message.conversation;
+                    let response = rep.message.conversation || rep.message.extendedTextMessage.text;
 
                     if (!isNaN(response)) {
                         position = parseInt(response);
@@ -109,8 +108,9 @@ ${grid[6]}   ${grid[7]}   ${grid[8]}
                             valide = true;
                         } else {
                             await ovl.sendMessage(ms_org, { text: "Position non valide, choisis une autre.", mentions: players }, { quoted: ms });
-                        }
-                    } else {
+                        } else if(reponse === `${config.PREFIXE}ttt`) {
+
+                     } else {
                         await ovl.sendMessage(ms_org, { text: "Numéro invalide, choisis un chiffre entre 1 et 9.", mentions: players }, { quoted: ms });
                     }
                 }
@@ -130,6 +130,9 @@ ${grid[6]}   ${grid[7]}   ${grid[8]}
             await ovl.sendMessage(ms_org, { text: `Match nul !\n${displayGrid(true)}`, mentions: players }, { quoted: ms });
             delete activeGames[auteur_Message];
             delete activeGames[joueur2ID];
+            }  else {
+                return ovl.sendMessage(ms_org, { text: 'Invitation refusée' }, { quoted: ms });
+            }
         } catch (error) {
             if (error.message === 'Timeout') {
                 ovl.sendMessage(ms_org, { text: `@${joueur2Nom} a pris trop de temps. Partie annulée.`, mentions: [auteur_Message, joueur2ID] }, { quoted: ms });
