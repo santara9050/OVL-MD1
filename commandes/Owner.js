@@ -584,3 +584,29 @@ ovlcmd(
     }
   }
 );
+
+ovlcmd(
+  {
+    nom_cmd: "jid",
+    classe: "Owner",
+    react: "🆔",
+    desc: "fournit le jid d'une personne ou d'un groupe",
+  },  
+  async (ms_org, ovl, cmd_options) => {
+    const { repondre, auteur_Msg_Repondu, prenium_id, msg_Repondu } = cmd_options;
+
+    if (!prenium_id) {
+      return repondre("Seuls les utilisateurs prenium peuvent utiliser cette commande");
+    }
+
+    let jid;
+
+    if (!msg_Repondu) {
+      jid = ms_org;
+    } else {
+      jid = auteur_Msg_Repondu
+    }
+
+    repondre(jid);
+  }
+);
