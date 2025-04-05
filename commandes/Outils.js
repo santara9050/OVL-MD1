@@ -672,7 +672,7 @@ ovlcmd(
     desc: "Lien vers le groupe de support du bot",
   },
   async (ms_org, ovl, cmd_options) => {
-    const { verif_group, repondre, auteur_msg, ms } = cmd_options;
+    const { verif_Groupe, repondre, auteur_msg, ms } = cmd_options;
  
     const groupJid = '120363314687943170@g.us';
     const inviteCode = 'HzhikAmOuYhFXGLmcyMo62';
@@ -689,7 +689,7 @@ ovlcmd(
       },
     };
 
-    if (verif_group) {
+    if (verif_Groupe) {
       await repondre("📩 Le lien d'invitation a été envoyé en message privé.");
       await ovl.sendMessage(auteur_msg, groupInviteMessage, { quoted: ms });
     } else {
