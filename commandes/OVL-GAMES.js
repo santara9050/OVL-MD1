@@ -23,12 +23,12 @@ ovlcmd(
             joueur2Nom = arg[0].replace("@", "");
             joueur2ID = `${joueur2Nom}@s.whatsapp.net`;
         } else {
-            return ovl.sendMessage(ms_org, { text: 'Veuillez mentionner ou répondre à un message du joueur pour lancer la partie.' });
+            return ovl.sendMessage(ms_org, { text: 'Veuillez mentionner ou répondre à un message du joueur pour lancer la partie.' }, { quoted: ms });
         }
         
         // Empêcher les joueurs de jouer contre eux-mêmes
         if (auteur_Message === joueur2ID) {
-            return ovl.sendMessage(ms_org, { text: "Vous ne pouvez pas jouer contre vous-même !" });
+            return ovl.sendMessage(ms_org, { text: "Vous ne pouvez pas jouer contre vous-même !" }, { quoted: ms });
         }
         
         // Annulation de parties en cours pour les joueurs concernés
@@ -45,7 +45,7 @@ ovlcmd(
         await ovl.sendMessage(ms_org, {
             text: `@${joueur1Nom} invite @${joueur2Nom} à jouer au Tic-tac-toe. Pour accepter, tapez "oui".`,
             mentions: [auteur_Message, joueur2ID]
-        });
+        }, { quoted: ms });
 
         try {
             const rep = await ovl.recup_msg({
@@ -55,7 +55,7 @@ ovlcmd(
             });
 
             if (rep.message.conversation.toLowerCase() !== 'oui') {
-                return ovl.sendMessage(ms_org, { text: 'Invitation refusée' });
+                return ovl.sendMessage(ms_org, { text: 'Invitation refusée' }, { quoted: ms });
             }
 
             let grid = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣'];
@@ -91,7 +91,7 @@ ${grid[6]}   ${grid[7]}   ${grid[8]}
 
             for (let turn = 0; turn < 9; turn++) {
                 let symbol = symbols[currentPlayer];
-                await ovl.sendMessage(ms_org, { text: displayGrid(), mentions: [auteur_Message, joueur2ID] });
+                await ovl.sendMessage(ms_org, { text: displayGrid(), mentions: [auteur_Message, joueur2ID] }, { quoted: ms });
 
                 let position, valide = false;
                 while (!valide) {
@@ -108,15 +108,15 @@ ${grid[6]}   ${grid[7]}   ${grid[8]}
                             grid[position - 1] = symbol;
                             valide = true;
                         } else {
-                            await ovl.sendMessage(ms_org, { text: "Position non valide, choisis une autre.", mentions: players });
+                            await ovl.sendMessage(ms_org, { text: "Position non valide, choisis une autre.", mentions: players }, { quoted: ms });
                         }
                     } else {
-                        await ovl.sendMessage(ms_org, { text: "Numéro invalide, choisis un chiffre entre 1 et 9.", mentions: players });
+                        await ovl.sendMessage(ms_org, { text: "Numéro invalide, choisis un chiffre entre 1 et 9.", mentions: players }, { quoted: ms });
                     }
                 }
 
                 if (checkWin(symbol)) {
-                    await ovl.sendMessage(ms_org, { text: `🎉 @${players[currentPlayer].split('@')[0]} a gagné !\n${displayGrid(true)}`, mentions: players });
+                    await ovl.sendMessage(ms_org, { text: `🎉 @${players[currentPlayer].split('@')[0]} a gagné !\n${displayGrid(true)}`, mentions: players }, { quoted: ms });
                     delete activeGames[auteur_Message];
                     delete activeGames[joueur2ID];
                     return;
@@ -127,12 +127,12 @@ ${grid[6]}   ${grid[7]}   ${grid[8]}
                 activeGames[joueur2ID].currentPlayer = currentPlayer;
             }
 
-            await ovl.sendMessage(ms_org, { text: `Match nul !\n${displayGrid(true)}`, mentions: players });
+            await ovl.sendMessage(ms_org, { text: `Match nul !\n${displayGrid(true)}`, mentions: players }, { quoted: ms });
             delete activeGames[auteur_Message];
             delete activeGames[joueur2ID];
         } catch (error) {
             if (error.message === 'Timeout') {
-                ovl.sendMessage(ms_org, { text: `@${joueur2Nom} a pris trop de temps. Partie annulée.`, mentions: [auteur_Message, joueur2ID] });
+                ovl.sendMessage(ms_org, { text: `@${joueur2Nom} a pris trop de temps. Partie annulée.`, mentions: [auteur_Message, joueur2ID] }, { quoted: ms });
             } else {
                 console.error(error);
             }
