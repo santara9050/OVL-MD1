@@ -108,7 +108,8 @@ ${grid[6]}   ${grid[7]}   ${grid[8]}
                             valide = true;
                         } else {
                             await ovl.sendMessage(ms_org, { text: "Position non valide, choisis une autre.", mentions: players }, { quoted: ms });
-                        } else if(reponse === `${config.PREFIXE}ttt`) {
+                        } 
+                    } else if(reponse === `${config.PREFIXE}ttt`) {
 
                      } else {
                         await ovl.sendMessage(ms_org, { text: "Numéro invalide, choisis un chiffre entre 1 et 9.", mentions: players }, { quoted: ms });
