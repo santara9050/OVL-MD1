@@ -608,3 +608,92 @@ ovlcmd(
   }
 );
 
+ovlcmd(
+  {
+    nom_cmd: "owner",
+    classe: "Outils",
+    react: "🔅",
+    desc: "Numero du propriétaire du bot",
+  },  
+  async (ms_org, ovl, cmd_options) => {
+    const vcard =
+      'BEGIN:VCARD\n' +
+      'VERSION:3.0\n' +
+      'FN:' + config.NOM_OWNER + '\n' +
+      'ORG:undefined;\n' +
+      'TEL;type=CELL;type=VOICE;waid=' + config.NUMERO_OWNER + ':+' + config.NUMERO_OWNER + '\n' + 
+      'END:VCARD';
+
+    ovl.sendMessage(ms_org, {
+      contacts: {
+        displayName: config.NOM_OWNER,
+        contacts: [{ vcard }],
+      },
+    }, { quoted: cmd_options.ms });
+  }
+);
+
+ovlcmd(
+  {
+    nom_cmd: "developpeur",
+    classe: "Outils",
+    react: "🔅",
+    desc: "Numero du créateur du bot",
+    alias: ['dev'],
+  },  
+  async (ms_org, ovl, cmd_options) => {
+    const devNum = '22651463203';
+    const devNom = 'Ainz';
+
+    const vcard =
+      'BEGIN:VCARD\n' +
+      'VERSION:3.0\n' +
+      'FN:' + devNom + '\n' +
+      'ORG:undefined;\n' +
+      'TEL;type=CELL;type=VOICE;waid=' + devNum + ':+' + devNum + '\n' + 
+      'END:VCARD';
+
+    ovl.sendMessage(ms_org, {
+      contacts: {
+        displayName: devNom,
+        contacts: [{ vcard }],
+      },
+    }, { quoted: cmd_options.ms });
+  }
+);
+
+
+
+ovlcmd(
+  {
+    nom_cmd: "support",
+    classe: "Outils",
+    react: "📩",
+    desc: "Lien vers le groupe de support du bot",
+  },
+  async (ms_org, ovl, cmd_options) => {
+    const { verif_group, repondre, auteur_msg, ms } = cmd_options;
+ 
+    const groupJid = '120363314687943170@g.us';
+    const inviteCode = 'HzhikAmOuYhFXGLmcyMo62';
+    const groupName = 'OVL-MD support group';
+
+    const groupInviteMessage = {
+      groupInviteMessage: {
+        groupJid,
+        inviteCode,
+        inviteExpiration: Math.floor(Date.now() / 1000) + 7 * 24 * 60 * 60,
+        groupName,
+        caption: 'OVL-MD SUPPORT',
+        jpegThumbnail: null,
+      },
+    };
+
+    if (verif_group) {
+      await repondre("📩 Le lien d'invitation a été envoyé en message privé.");
+      await ovl.sendMessage(auteur_msg, groupInviteMessage, { quoted: ms });
+    } else {
+      await ovl.sendMessage(ms_org, groupInviteMessage, { quoted: ms });
+    }
+  }
+);
