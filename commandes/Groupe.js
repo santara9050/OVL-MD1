@@ -96,7 +96,7 @@ ovlcmd(
 
     },
     async (dest, ovl, cmd_options) => {
-        const { repondre, msg_Repondu, verif_Groupe, arg, verif_Admin } = cmd_options;
+        const { repondre, msg_Repondu, verif_Groupe, arg, verif_Admin, ms } = cmd_options;
 
         if (!verif_Groupe) {
             repondre("Cette commande ne fonctionne que dans les groupes");
@@ -147,7 +147,7 @@ ovlcmd(
                     };
                 }
 
-                ovl.sendMessage(dest, contenu_msg);
+                ovl.sendMessage(dest, contenu_msg, { quoted: ms });
             } else {
                 if (!arg || !arg[0]) {
                     repondre("Veuillez inclure ou mentionner un message à partager.");
@@ -157,7 +157,7 @@ ovlcmd(
                 ovl.sendMessage(dest, {
                     text: arg.join(' '),
                     mentions: membres_Groupe
-                });
+                }, { quoted: ms });
             }
         } else {
             repondre("Cette commande est réservée aux administrateurs du groupe");
@@ -217,30 +217,30 @@ ovlcmd(
     desc: "Supprime un membre du groupe.",
   },
   async (ms_org, ovl, cmd_options) => {
-    const { verif_Groupe, auteur_Msg_Repondu, arg, infos_Groupe, verif_Admin, verif_Ovl_Admin, prenium_id, dev_num } = cmd_options;
-    if (!verif_Groupe) return ovl.sendMessage(ms_org, { text: "Commande utilisable uniquement dans les groupes." });
+    const { verif_Groupe, auteur_Msg_Repondu, arg, infos_Groupe, verif_Admin, verif_Ovl_Admin, prenium_id, dev_num, ms } = cmd_options;
+    if (!verif_Groupe) return ovl.sendMessage(ms_org, { text: "Commande utilisable uniquement dans les groupes." }, { quoted: ms });
     if (prenium_id || verif_Admin) {
     const membres = await infos_Groupe.participants;
     const admins = membres.filter((m) => m.admin).map((m) => m.id);
     const membre = auteur_Msg_Repondu || (arg[0]?.includes("@") && `${arg[0].replace("@", "")}@s.whatsapp.net`);
       if (!verif_Ovl_Admin)
-      return ovl.sendMessage(ms_org, { text: "Je dois être administrateur pour effectuer cette action." });
+      return ovl.sendMessage(ms_org, { text: "Je dois être administrateur pour effectuer cette action." }, { quoted: ms });
 
      if (!membre || !membres.find((m) => m.id === membre))
-      return ovl.sendMessage(ms_org, { text: "Membre introuvable dans ce groupe." });
+      return ovl.sendMessage(ms_org, { text: "Membre introuvable dans ce groupe." }, { quoted: ms });
     if (admins.includes(membre))
-      return ovl.sendMessage(ms_org, { text: "Impossible d'exclure un administrateur du groupe." });
+      return ovl.sendMessage(ms_org, { text: "Impossible d'exclure un administrateur du groupe." }, { quoted: ms });
     if (dev_num.includes(membre)) {
-      return ovl.sendMessage(ms_org, { text: "Vous ne pouvez pas exclure un développeur." });
+      return ovl.sendMessage(ms_org, { text: "Vous ne pouvez pas exclure un développeur." }, { quoted: ms });
     }
     try {
       await ovl.groupParticipantsUpdate(ms_org, [membre], "remove");
-      ovl.sendMessage(ms_org, { text: `@${membre.split("@")[0]} a été exclu.`, mentions: [membre] });
+      ovl.sendMessage(ms_org, { text: `@${membre.split("@")[0]} a été exclu.`, mentions: [membre] }, { quoted: ms });
     } catch (err) {
       console.error("Erreur :", err);
-      ovl.sendMessage(ms_org, { text: "Une erreur est survenue lors de l'exclusion." });
+      ovl.sendMessage(ms_org, { text: "Une erreur est survenue lors de l'exclusion." }, { quoted: ms });
     }
-    } else { return ovl.sendMessage(ms_org, { text: "Vous n'avez pas la permission d'utiliser cette commande." });
+    } else { return ovl.sendMessage(ms_org, { text: "Vous n'avez pas la permission d'utiliser cette commande." }, { quoted: ms });
            };
   }
 );
@@ -253,29 +253,29 @@ ovlcmd(
     desc: "Supprime tous les membres non administrateurs du groupe.",
   },
   async (ms_org, ovl, cmd_options) => {
-    const { verif_Groupe, verif_Admin, verif_Ovl_Admin, infos_Groupe, prenium_id, dev_num } = cmd_options;
+    const { verif_Groupe, verif_Admin, verif_Ovl_Admin, infos_Groupe, prenium_id, dev_num, ms } = cmd_options;
     
-    if (!verif_Groupe) return ovl.sendMessage(ms_org, { text: "Commande utilisable uniquement dans les groupes." });
+    if (!verif_Groupe) return ovl.sendMessage(ms_org, { text: "Commande utilisable uniquement dans les groupes." }, { quoted: ms });
     
     if (!(prenium_id || verif_Admin)) {
-      return ovl.sendMessage(ms_org, { text: "Vous n'avez pas la permission d'utiliser cette commande." });
+      return ovl.sendMessage(ms_org, { text: "Vous n'avez pas la permission d'utiliser cette commande." }, { quoted: ms });
     }
 
     if (!verif_Ovl_Admin) {
-      return ovl.sendMessage(ms_org, { text: "Je dois être administrateur pour effectuer cette action." });
+      return ovl.sendMessage(ms_org, { text: "Je dois être administrateur pour effectuer cette action." }, { quoted: ms });
     }
 
     const settings = await GroupSettings.findOne({ where: { id: ms_org } });
 
     if (settings && settings.goodbye == "oui") {
-      return ovl.sendMessage(ms_org, { text: "Désactivez le goodbye message (goodbye off) avant de continuer." });
+      return ovl.sendMessage(ms_org, { text: "Désactivez le goodbye message (goodbye off) avant de continuer." }, { quoted: ms });
     }
 
     const membres = await infos_Groupe.participants;
     const nonAdmins = membres.filter((m) => !m.admin && !dev_num.includes(m.id)).map((m) => m.id);
 
     if (nonAdmins.length === 0) {
-      return ovl.sendMessage(ms_org, { text: "Il n'y a aucun membre non administrateur à exclure." });
+      return ovl.sendMessage(ms_org, { text: "Il n'y a aucun membre non administrateur à exclure." }, { quoted: ms });
     }
 
     for (const membre of nonAdmins) {
@@ -287,7 +287,7 @@ ovlcmd(
       }
     }
 
-    ovl.sendMessage(ms_org, { text: `✅ ${nonAdmins.length} membre(s) ont été exclus du groupe.` });
+    ovl.sendMessage(ms_org, { text: `✅ ${nonAdmins.length} membre(s) ont été exclus du groupe.` }, { quoted: ms });
   }
 );
 
@@ -299,29 +299,29 @@ ovlcmd(
     desc: "Supprime tous les membres non administrateurs dont le JID commence par un indicatif spécifique.",
   },
   async (ms_org, ovl, cmd_options) => {
-    const { verif_Groupe, verif_Admin, verif_Ovl_Admin, infos_Groupe, prenium_id, arg, dev_num, auteur_Msg_Repondu, dev_id } = cmd_options;
+    const { verif_Groupe, verif_Admin, verif_Ovl_Admin, infos_Groupe, prenium_id, arg, dev_num, auteur_Msg_Repondu, dev_id, ms } = cmd_options;
     
     if (!verif_Groupe) 
-      return ovl.sendMessage(ms_org, { text: "Commande utilisable uniquement dans les groupes." });
+      return ovl.sendMessage(ms_org, { text: "Commande utilisable uniquement dans les groupes." }, { quoted: ms });
     
     if (!(prenium_id || verif_Admin)) {
-      return ovl.sendMessage(ms_org, { text: "Vous n'avez pas la permission d'utiliser cette commande." });
+      return ovl.sendMessage(ms_org, { text: "Vous n'avez pas la permission d'utiliser cette commande." }, { quoted: ms });
     }
 
     if (!arg[0]) 
-      return ovl.sendMessage(ms_org, { text: "Veuillez spécifier l'indicatif." });
+      return ovl.sendMessage(ms_org, { text: "Veuillez spécifier l'indicatif." }, { quoted: ms });
 
     const indicatif = arg[0];
     const membres = await infos_Groupe.participants;
 
     if (!verif_Ovl_Admin) {
-      return ovl.sendMessage(ms_org, { text: "Je dois être administrateur pour effectuer cette action." });
+      return ovl.sendMessage(ms_org, { text: "Je dois être administrateur pour effectuer cette action." }, { quoted: ms });
     }
 
     const settings = await GroupSettings.findOne({ where: { id: ms_org } });
 
     if (settings && settings.goodbye == "oui") {
-      return ovl.sendMessage(ms_org, { text: "Désactivez le goodbye message (goodbye off) avant de continuer." });
+      return ovl.sendMessage(ms_org, { text: "Désactivez le goodbye message (goodbye off) avant de continuer." }, { quoted: ms });
     }
 
     const membresToKick = membres
@@ -329,11 +329,11 @@ ovlcmd(
       .map((m) => m.id);
 
     if (membresToKick.length === 0) {
-      return ovl.sendMessage(ms_org, { text: `Aucun membre non administrateur trouvé avec l'indicatif ${indicatif}.` });
+      return ovl.sendMessage(ms_org, { text: `Aucun membre non administrateur trouvé avec l'indicatif ${indicatif}.` }, { quoted: ms });
     }
 
     if (dev_num.includes(auteur_Msg_Repondu) && !dev_id) {
-      return ovl.sendMessage(ms_org, { text: "Vous ne pouvez pas supprimer un développeur." });
+      return ovl.sendMessage(ms_org, { text: "Vous ne pouvez pas supprimer un développeur." }, { quoted: ms });
     }
 
     for (const membre of membresToKick) {
@@ -345,7 +345,7 @@ ovlcmd(
       }
     }
 
-    ovl.sendMessage(ms_org, { text: `✅ ${membresToKick.length} membre(s) ayant l'indicatif ${indicatif} ont été exclus du groupe.` });
+    ovl.sendMessage(ms_org, { text: `✅ ${membresToKick.length} membre(s) ayant l'indicatif ${indicatif} ont été exclus du groupe.` }, { quoted: ms });
   }
 );
 
@@ -357,28 +357,28 @@ ovlcmd(
     desc: "Promouvoir un membre comme administrateur.",
   },
   async (ms_org, ovl, cmd_options) => {
-    const { verif_Groupe, auteur_Msg_Repondu, arg, infos_Groupe, verif_Admin, prenium_id, verif_Ovl_Admin } = cmd_options;
-    if (!verif_Groupe) return ovl.sendMessage(ms_org, { text: "Commande utilisable uniquement dans les groupes." });
+    const { verif_Groupe, auteur_Msg_Repondu, arg, infos_Groupe, verif_Admin, prenium_id, verif_Ovl_Admin, ms } = cmd_options;
+    if (!verif_Groupe) return ovl.sendMessage(ms_org, { text: "Commande utilisable uniquement dans les groupes." }, { quoted: ms });
     if (verif_Admin || prenium_id) {
     const membres = await infos_Groupe.participants;
     const admins = membres.filter((m) => m.admin).map((m) => m.id);
     const membre = auteur_Msg_Repondu || (arg[0]?.includes("@") && `${arg[0].replace("@", "")}@s.whatsapp.net`);
     if (!verif_Ovl_Admin)
-      return ovl.sendMessage(ms_org, { text: "Je dois être administrateur pour effectuer cette action." });
-    if (!membre) return ovl.sendMessage(ms_org, { text: "Veuillez mentionner un membre à promouvoir." });
+      return ovl.sendMessage(ms_org, { text: "Je dois être administrateur pour effectuer cette action." }, { quoted: ms });
+    if (!membre) return ovl.sendMessage(ms_org, { text: "Veuillez mentionner un membre à promouvoir." }, { quoted: ms });
     if (!membres.find((m) => m.id === membre))
-      return ovl.sendMessage(ms_org, { text: "Membre introuvable dans ce groupe." });
+      return ovl.sendMessage(ms_org, { text: "Membre introuvable dans ce groupe." }, { quoted: ms });
     if (admins.includes(membre))
-      return ovl.sendMessage(ms_org, { text: "ce membre est déjà un administrateur du groupe." });
+      return ovl.sendMessage(ms_org, { text: "ce membre est déjà un administrateur du groupe." }, { quoted: ms });
 
     try {
       await ovl.groupParticipantsUpdate(ms_org, [membre], "promote");
-      ovl.sendMessage(ms_org, { text: `@${membre.split("@")[0]} a été promu administrateur.`, mentions: [membre] });
+      ovl.sendMessage(ms_org, { text: `@${membre.split("@")[0]} a été promu administrateur.`, mentions: [membre] }, { quoted: ms });
     } catch (err) {
       console.error("Erreur :", err);
-      ovl.sendMessage(ms_org, { text: "Une erreur est survenue lors de la promotion." });
+      ovl.sendMessage(ms_org, { text: "Une erreur est survenue lors de la promotion." }, { quoted: ms });
     }
-    } else { return ovl.sendMessage(ms_org, { text: "Vous n'avez pas la permission d'utiliser cette commande." });
+    } else { return ovl.sendMessage(ms_org, { text: "Vous n'avez pas la permission d'utiliser cette commande." }, { quoted: ms });
            }
   }
 );
@@ -391,32 +391,32 @@ ovlcmd(
     desc: "Retirer le rôle d'administrateur à un membre.",
   },
   async (ms_org, ovl, cmd_options) => {
-    const { verif_Groupe, auteur_Msg_Repondu, arg, infos_Groupe, verif_Admin, prenium_id, verif_Ovl_Admin, dev_num, dev_id } = cmd_options;
-    if (!verif_Groupe) return ovl.sendMessage(ms_org, { text: "Commande utilisable uniquement dans les groupes." });
+    const { verif_Groupe, auteur_Msg_Repondu, arg, infos_Groupe, verif_Admin, prenium_id, verif_Ovl_Admin, dev_num, dev_id, ms } = cmd_options;
+    if (!verif_Groupe) return ovl.sendMessage(ms_org, { text: "Commande utilisable uniquement dans les groupes." }, { quoted: ms });
     if (verif_Admin || prenium_id) { 
     const membres = await infos_Groupe.participants;
     const admins = membres.filter((m) => m.admin).map((m) => m.id);
     const membre = auteur_Msg_Repondu || (arg[0]?.includes("@") && `${arg[0].replace("@", "")}@s.whatsapp.net`);
     if (!verif_Ovl_Admin)
-      return ovl.sendMessage(ms_org, { text: "Je dois être administrateur pour effectuer cette action." });
-    if (!membre) return ovl.sendMessage(ms_org, { text: "Veuillez mentionner un membre à rétrograder." });
+      return ovl.sendMessage(ms_org, { text: "Je dois être administrateur pour effectuer cette action." }, { quoted: ms });
+    if (!membre) return ovl.sendMessage(ms_org, { text: "Veuillez mentionner un membre à rétrograder." }, { quoted: ms });
     if (!membres.find((m) => m.id === membre))
       return ovl.sendMessage(ms_org, { text: "Membre introuvable dans ce groupe." });
     if (!admins.includes(membre))
-      return ovl.sendMessage(ms_org, { text: "ce membre n'est pas un administrateur du groupe." });
+      return ovl.sendMessage(ms_org, { text: "ce membre n'est pas un administrateur du groupe." }, { quoted: ms });
     
       if (dev_num.includes(membre)) {
-      return ovl.sendMessage(ms_org, { text: "Vous ne pouvez pas rétrograder un développeur." });
+      return ovl.sendMessage(ms_org, { text: "Vous ne pouvez pas rétrograder un développeur." }, { quoted: ms });
     }
 
     try {
       await ovl.groupParticipantsUpdate(ms_org, [membre], "demote");
-      ovl.sendMessage(ms_org, { text: `@${membre.split("@")[0]} a été rétrogradé.`, mentions: [membre] });
+      ovl.sendMessage(ms_org, { text: `@${membre.split("@")[0]} a été rétrogradé.`, mentions: [membre] }, { quoted: ms });
     } catch (err) {
       console.error("Erreur :", err);
-      ovl.sendMessage(ms_org, { text: "Une erreur est survenue lors de la rétrogradation." });
+      ovl.sendMessage(ms_org, { text: "Une erreur est survenue lors de la rétrogradation." }, { quoted: ms });
     }
-    } else { return ovl.sendMessage(ms_org, { text: "Vous n'avez pas la permission d'utiliser cette commande." });
+    } else { return ovl.sendMessage(ms_org, { text: "Vous n'avez pas la permission d'utiliser cette commande." }, { quoted: ms });
            }
   }
 );
@@ -432,23 +432,23 @@ ovlcmd(
     const { msg_Repondu, ms, auteur_Msg_Repondu, verif_Admin, verif_Ovl_Admin, verif_Groupe, id_Bot, dev_num, dev_id } = cmd_options;
 
     if (!verif_Groupe) {
-      return ovl.sendMessage(ms_org, { text: "Commande utilisable uniquement dans les groupes." });
+      return ovl.sendMessage(ms_org, { text: "Commande utilisable uniquement dans les groupes." }, { quoted: ms });
     }
 
     if (!verif_Admin) {
-      return ovl.sendMessage(ms_org, { text: "Vous devez être administrateur pour utiliser cette commande." });
+      return ovl.sendMessage(ms_org, { text: "Vous devez être administrateur pour utiliser cette commande." }, { quoted: ms });
     }
 
     if (!verif_Ovl_Admin) {
-      return ovl.sendMessage(ms_org, { text: "Je dois être administrateur pour effectuer cette action." });
+      return ovl.sendMessage(ms_org, { text: "Je dois être administrateur pour effectuer cette action." }, { quoted: ms });
     }
 
     if (!msg_Repondu) {
-      return ovl.sendMessage(ms_org, { text: "Veuillez répondre à un message pour le supprimer." });
+      return ovl.sendMessage(ms_org, { text: "Veuillez répondre à un message pour le supprimer." }, { quoted: ms });
     }
    
       if (dev_num.includes(auteur_Msg_Repondu) && !dev_id) {
-      return ovl.sendMessage(ms_org, { text: "Vous ne pouvez pas supprimer le message d'un développeur." });
+      return ovl.sendMessage(ms_org, { text: "Vous ne pouvez pas supprimer le message d'un développeur." }, { quoted: ms });
     }
 
     try {
@@ -462,7 +462,7 @@ ovlcmd(
       await ovl.sendMessage(ms_org, { delete: key });
     } catch (error) {
       console.error("Erreur lors de la suppression :", error);
-      ovl.sendMessage(ms_org, { text: `Erreur lors de la suppression : ${error.message}` });
+      ovl.sendMessage(ms_org, { text: `Erreur lors de la suppression : ${error.message}` }, { quoted: ms });
     }
   }
 );
@@ -475,14 +475,14 @@ ovlcmd(
     desc: "Permet de créer un groupe et d'y ajouter des membres mentionnés.",
   },
   async (jid, ovl, cmd_options) => {
-    const { arg, prenium_id, auteur_Msg_Repondu } = cmd_options;
+    const { arg, prenium_id, auteur_Msg_Repondu, ms } = cmd_options;
 
     if (!prenium_id) {
-      return ovl.sendMessage(jid, { text: `Vous n'avez pas les permissions requises pour créer un groupe.` });
+      return ovl.sendMessage(jid, { text: `Vous n'avez pas les permissions requises pour créer un groupe.` }, { quoted: ms });
     }
 
     if (arg.length === 0 && !auteur_Msg_Repondu) {
-      return ovl.sendMessage(jid, { text: `Veuillez fournir un nom pour le groupe et mentionner des membres ou répondre à un message contenant des tags.` });
+      return ovl.sendMessage(jid, { text: `Veuillez fournir un nom pour le groupe et mentionner des membres ou répondre à un message contenant des tags.` }, { quoted: ms });
     }
 
     const name = arg[0];
@@ -503,15 +503,15 @@ ovlcmd(
     }
 
     if (membres.length === 0) {
-      return ovl.sendMessage(jid, { text: `Aucun membre mentionné ou tagué trouvé pour ajouter au groupe.` });
+      return ovl.sendMessage(jid, { text: `Aucun membre mentionné ou tagué trouvé pour ajouter au groupe.` }, { quoted: ms });
     }
 
     try {
       const group = await ovl.groupCreate(name, membres);
-      await ovl.sendMessage(group.id, { text: `Groupe "${name}" créé avec succès ! 🎉` });
+      await ovl.sendMessage(group.id, { text: `Groupe "${name}" créé avec succès ! 🎉` }, { quoted: ms });
     } catch (err) {
       console.error("Erreur lors de la création du groupe :", err);
-      await ovl.sendMessage(jid, { text: `Une erreur est survenue lors de la création du groupe. Veuillez réessayer.` });
+      await ovl.sendMessage(jid, { text: `Une erreur est survenue lors de la création du groupe. Veuillez réessayer.` }, { quoted: ms });
     }
   }
 );
@@ -524,9 +524,9 @@ ovlcmd(
     desc: "Permet de changer la description d'un groupe",
   },
   async (jid, ovl, cmd_options) => {
-    const { verif_Groupe, verif_Admin, verif_Ovl_Admin, msg_Repondu, arg } = cmd_options;
+    const { verif_Groupe, verif_Admin, verif_Ovl_Admin, msg_Repondu, arg, ms } = cmd_options;
 
-    if (!verif_Groupe) return ovl.sendMessage(jid, { text: "Commande utilisable uniquement dans les groupes." });
+    if (!verif_Groupe) return ovl.sendMessage(jid, { text: "Commande utilisable uniquement dans les groupes." }, { quoted: ms });
 
     if (verif_Admin && verif_Ovl_Admin) {
       let desc;
@@ -535,11 +535,11 @@ ovlcmd(
       } else if (arg) {
         desc = arg.join(' ');
       } else {
-        return ovl.sendMessage(jid, { text: "Entrez la nouvelle description." });
+        return ovl.sendMessage(jid, { text: "Entrez la nouvelle description." }, { quoted: ms });
       }
 
       await ovl.groupUpdateDescription(jid, desc);
-    } else { ovl.sendMessage(jid, { text: 'je n\'ai pas les droits requis pour exécuter cette commande' }) }
+    } else { ovl.sendMessage(jid, { text: 'je n\'ai pas les droits requis pour exécuter cette commande' }, { quoted: ms }) }
   }
 );
 
@@ -551,9 +551,9 @@ ovlcmd(
     desc: "Permet de changer le nom d'un groupe",
   },
   async (jid, ovl, cmd_options) => {
-    const { verif_Groupe, verif_Admin, verif_Ovl_Admin, msg_Repondu, arg } = cmd_options;
+    const { verif_Groupe, verif_Admin, verif_Ovl_Admin, msg_Repondu, arg, ms } = cmd_options;
 
-    if (!verif_Groupe) return ovl.sendMessage(jid, { text: "Commande utilisable uniquement dans les groupes." });
+    if (!verif_Groupe) return ovl.sendMessage(jid, { text: "Commande utilisable uniquement dans les groupes." }, { quoted: ms });
 
     if (verif_Admin && verif_Ovl_Admin) {
       let name;
@@ -562,11 +562,11 @@ ovlcmd(
       } else if (arg) {
         name = arg.join(' ');
       } else {
-        return ovl.sendMessage(jid, { text: "Entrez un nouveau nom" });
+        return ovl.sendMessage(jid, { text: "Entrez un nouveau nom" }, { quoted: ms });
       }
 
       await ovl.groupUpdateSubject(jid, name);
-    } else { ovl.sendMessage(jid, { text: 'je n\'ai pas les droits requis pour exécuter cette commande' }) }
+    } else { ovl.sendMessage(jid, { text: 'je n\'ai pas les droits requis pour exécuter cette commande' }, { quoted: ms }) }
   }
 );
 
@@ -578,16 +578,16 @@ ovlcmd(
     desc: "Seuls les admins peuvent envoyer des messages",
   },
   async (jid, ovl, cmd_options) => {
-    const { verif_Groupe, verif_Admin, verif_Ovl_Admin } = cmd_options;
+    const { verif_Groupe, verif_Admin, verif_Ovl_Admin, ms } = cmd_options;
 
     if (!verif_Groupe) 
-      return ovl.sendMessage(jid, { text: "Commande utilisable uniquement dans les groupes." });
+      return ovl.sendMessage(jid, { text: "Commande utilisable uniquement dans les groupes." }, { quoted: ms });
 
     if (!verif_Admin || !verif_Ovl_Admin)
-      return ovl.sendMessage(jid, { text: "Je n'ai pas les droits requis pour exécuter cette commande." });
+      return ovl.sendMessage(jid, { text: "Je n'ai pas les droits requis pour exécuter cette commande." }, { quoted: ms });
 
     await ovl.groupSettingUpdate(jid, "announcement");
-    return ovl.sendMessage(jid, { text: "Mode défini : seuls les admins peuvent envoyer des messages." });
+    return ovl.sendMessage(jid, { text: "Mode défini : seuls les admins peuvent envoyer des messages." }, { quoted: ms });
   }
 );
 
@@ -599,16 +599,16 @@ ovlcmd(
     desc: "Tout le monde peut envoyer des messages",
   },
   async (jid, ovl, cmd_options) => {
-    const { verif_Groupe, verif_Admin, verif_Ovl_Admin } = cmd_options;
+    const { verif_Groupe, verif_Admin, verif_Ovl_Admin, ms } = cmd_options;
 
     if (!verif_Groupe) 
-      return ovl.sendMessage(jid, { text: "Commande utilisable uniquement dans les groupes." });
+      return ovl.sendMessage(jid, { text: "Commande utilisable uniquement dans les groupes." }, { quoted: ms });
 
     if (!verif_Admin || !verif_Ovl_Admin)
-      return ovl.sendMessage(jid, { text: "Je n'ai pas les droits requis pour exécuter cette commande." });
+      return ovl.sendMessage(jid, { text: "Je n'ai pas les droits requis pour exécuter cette commande." }, { quoted: ms });
 
     await ovl.groupSettingUpdate(jid, "not_announcement");
-    return ovl.sendMessage(jid, { text: "Mode défini : tout le monde peut envoyer des messages." });
+    return ovl.sendMessage(jid, { text: "Mode défini : tout le monde peut envoyer des messages." }, { quoted: ms });
   }
 );
 
@@ -620,16 +620,16 @@ ovlcmd(
     desc: "Tout le monde peut modifier les paramètres du groupe",
   },
   async (jid, ovl, cmd_options) => {
-    const { verif_Groupe, verif_Admin, verif_Ovl_Admin } = cmd_options;
+    const { verif_Groupe, verif_Admin, verif_Ovl_Admin, ms } = cmd_options;
 
     if (!verif_Groupe) 
-      return ovl.sendMessage(jid, { text: "Commande utilisable uniquement dans les groupes." });
+      return ovl.sendMessage(jid, { text: "Commande utilisable uniquement dans les groupes." }, { quoted: ms });
 
     if (!verif_Admin || !verif_Ovl_Admin)
-      return ovl.sendMessage(jid, { text: "Je n'ai pas les droits requis pour exécuter cette commande." });
+      return ovl.sendMessage(jid, { text: "Je n'ai pas les droits requis pour exécuter cette commande." }, { quoted: ms });
       
     await ovl.groupSettingUpdate(jid, "unlocked");
-    return ovl.sendMessage(jid, { text: "Mode défini : tout le monde peut modifier les paramètres du groupe." });
+    return ovl.sendMessage(jid, { text: "Mode défini : tout le monde peut modifier les paramètres du groupe." }, { quoted: ms });
   }
 );
 
@@ -641,16 +641,16 @@ ovlcmd(
     desc: "Seuls les admins peuvent modifier les paramètres du groupe",
   },
   async (jid, ovl, cmd_options) => {
-    const { verif_Groupe, verif_Admin, verif_Ovl_Admin } = cmd_options;
+    const { verif_Groupe, verif_Admin, verif_Ovl_Admin, ms } = cmd_options;
 
     if (!verif_Groupe) 
-      return ovl.sendMessage(jid, { text: "Commande utilisable uniquement dans les groupes." });
+      return ovl.sendMessage(jid, { text: "Commande utilisable uniquement dans les groupes." }, { quoted: ms });
 
     if (!verif_Admin || !verif_Ovl_Admin)
-      return ovl.sendMessage(jid, { text: "Je n'ai pas les droits requis pour exécuter cette commande." });
+      return ovl.sendMessage(jid, { text: "Je n'ai pas les droits requis pour exécuter cette commande." }, { quoted: ms });
 
     await ovl.groupSettingUpdate(jid, "locked");
-    return ovl.sendMessage(jid, { text: "Mode défini : seuls les admins peuvent modifier les paramètres du groupe." });
+    return ovl.sendMessage(jid, { text: "Mode défini : seuls les admins peuvent modifier les paramètres du groupe." }, { quoted: ms });
   }
 );
 
@@ -664,9 +664,9 @@ ovlcmd(
   async (jid, ovl, cmd_options) => {
     const { prenium_id } = cmd_options;
     if (!prenium_id) {
-      return ovl.sendMessage(jid, { text: "Vous n'avez pas les permissions requises pour quitter ce groupe." });
+      return ovl.sendMessage(jid, { text: "Vous n'avez pas les permissions requises pour quitter ce groupe." }, { quoted: cmd_options.ms });
     }
-    await ovl.sendMessage(jid, { text: "Sayonara" });
+    await ovl.sendMessage(jid, { text: "Sayonara" }, { quoted: cmd_options.ms });
     await ovl.groupLeave(jid);
   }
 );
@@ -679,11 +679,11 @@ ovlcmd(
     desc: "Permet d'obtenir le lien d'invitation d'un groupe",
   },
   async (jid, ovl, cmd_options) => {
-    const { verif_Groupe, verif_Admin, verif_Ovl_Admin } = cmd_options;
-    if (!verif_Groupe) return ovl.sendMessage(jid, { text: "Commande utilisable uniquement dans les groupes." });
+    const { verif_Groupe, verif_Admin, verif_Ovl_Admin, ms } = cmd_options;
+    if (!verif_Groupe) return ovl.sendMessage(jid, { text: "Commande utilisable uniquement dans les groupes." }, { quoted: ms });
     if (verif_Admin && verif_Ovl_Admin) {
       const code = await ovl.groupInviteCode(jid);
-      await ovl.sendMessage(jid, { text: `Lien d'invitation: https://chat.whatsapp.com/${code}` });
+      await ovl.sendMessage(jid, { text: `Lien d'invitation: https://chat.whatsapp.com/${code}` }, { quoted: ms });
     }
   }
 );
@@ -696,11 +696,11 @@ ovlcmd(
     desc: "Réinitialise le lien d'invitation d'un groupe",
   },
   async (jid, ovl, cmd_options) => {
-    const { verif_Groupe, verif_Admin, verif_Ovl_Admin } = cmd_options;
-    if (!verif_Groupe) return ovl.sendMessage(jid, { text: "Commande utilisable uniquement dans les groupes." });
+    const { verif_Groupe, verif_Admin, verif_Ovl_Admin, ms } = cmd_options;
+    if (!verif_Groupe) return ovl.sendMessage(jid, { text: "Commande utilisable uniquement dans les groupes." }, { quoted: ms });
     if (verif_Admin && verif_Ovl_Admin) {
       await ovl.groupRevokeInvite(jid);
-      await ovl.sendMessage(jid, { text: 'Le lien d\'invitation a été Réinitialisé.' });
+      await ovl.sendMessage(jid, { text: 'Le lien d\'invitation a été Réinitialisé.' }, { quoted: ms });
     }
   }
 );
@@ -714,7 +714,7 @@ ovlcmd(
   },
   async (jid, ovl, cmd_options) => {
     const metadata = await ovl.groupMetadata(jid);
-    await ovl.sendMessage(jid, { text: `ID: ${metadata.id}\nNom: ${metadata.subject}\nDescription: ${metadata.desc}` });
+    await ovl.sendMessage(jid, { text: `ID: ${metadata.id}\nNom: ${metadata.subject}\nDescription: ${metadata.desc}` }, { quoted: cmd_options.ms });
   }
 );
 
@@ -726,15 +726,15 @@ ovlcmd(
     desc: "Permet de rejoindre un groupe via un lien d'invitation",
   },
   async (jid, ovl, cmd_options) => {
-    const { prenium_id, arg } = cmd_options;
+    const { prenium_id, arg, ms } = cmd_options;
     if (!prenium_id) {
-      return ovl.sendMessage(jid, { text: `Vous n'avez pas les permissions requises pour rejoindre un groupe.` });
+      return ovl.sendMessage(jid, { text: `Vous n'avez pas les permissions requises pour rejoindre un groupe.` }, { quoted: ms });
     }
-    if (!arg) return ovl.sendMessage(jid, { text: 'Veuillez fournir le lien d\'invitation du groupe.' });
+    if (!arg) return ovl.sendMessage(jid, { text: 'Veuillez fournir le lien d\'invitation du groupe.' }, { quoted: ms });
     const invite = arg.join("");
     const code = invite.split('/')[3];
     await ovl.groupAcceptInvite(code);
-    await ovl.sendMessage(jid, { text: 'Vous avez rejoint le groupe avec succès.' });
+    await ovl.sendMessage(jid, { text: 'Vous avez rejoint le groupe avec succès.' }, { quoted: ms });
   }
 );
 
@@ -747,15 +747,15 @@ ovlcmd(
   },
   async (jid, ovl, cmd_options) => {
     const { verif_Admin, prenium_id, verif_Ovl_Admin, verif_Groupe } = cmd_options;
-    if (!verif_Groupe) return ovl.sendMessage(jid, { text: "Commande réservée aux groupes uniquement." });
-    if (!verif_Admin && !prenium_id) return ovl.sendMessage(jid, { text: "Vous n'avez pas les permissions pour utiliser cette commande." });
-    if (!verif_Ovl_Admin) return ovl.sendMessage(jid, { text: "Je dois être administrateur pour effectuer cette action." });
+    if (!verif_Groupe) return ovl.sendMessage(jid, { text: "Commande réservée aux groupes uniquement." }, { quoted: cmd_options.ms });
+    if (!verif_Admin && !prenium_id) return ovl.sendMessage(jid, { text: "Vous n'avez pas les permissions pour utiliser cette commande." }, { quoted: cmd_options.ms });
+    if (!verif_Ovl_Admin) return ovl.sendMessage(jid, { text: "Je dois être administrateur pour effectuer cette action." }, { quoted: cmd_options.ms });
 
     try {
       await ovl.groupRequestParticipantsUpdate(jid, "approve");
-      ovl.sendMessage(jid, { text: "Toutes les demandes ont été acceptées." });
+      ovl.sendMessage(jid, { text: "Toutes les demandes ont été acceptées." }, { quoted: cmd_options.ms });
     } catch (err) {
-      ovl.sendMessage(jid, { text: "Une erreur est survenue lors de l'acceptation des demandes." });
+      ovl.sendMessage(jid, { text: "Une erreur est survenue lors de l'acceptation des demandes." }, { quoted: cmd_options.ms });
     }
   }
 );
@@ -769,15 +769,15 @@ ovlcmd(
   },
   async (jid, ovl, cmd_options) => {
     const { verif_Admin, prenium_id, verif_Ovl_Admin, verif_Groupe } = cmd_options;
-    if (!verif_Groupe) return ovl.sendMessage(jid, { text: "Commande réservée aux groupes uniquement." });
-    if (!verif_Admin && !prenium_id) return ovl.sendMessage(jid, { text: "Vous n'avez pas les permissions pour utiliser cette commande." });
-    if (!verif_Ovl_Admin) return ovl.sendMessage(jid, { text: "Je dois être administrateur pour effectuer cette action." });
+    if (!verif_Groupe) return ovl.sendMessage(jid, { text: "Commande réservée aux groupes uniquement." }, { quoted: cmd_options.ms });
+    if (!verif_Admin && !prenium_id) return ovl.sendMessage(jid, { text: "Vous n'avez pas les permissions pour utiliser cette commande." }, { quoted: cmd_options.ms });
+    if (!verif_Ovl_Admin) return ovl.sendMessage(jid, { text: "Je dois être administrateur pour effectuer cette action." }, { quoted: cmd_options.ms });
 
     try {
       await ovl.groupRequestParticipantsUpdate(jid, "reject");
-      ovl.sendMessage(jid, { text: "Toutes les demandes ont été rejetées." });
+      ovl.sendMessage(jid, { text: "Toutes les demandes ont été rejetées." }, { quoted: cmd_options.ms });
     } catch (err) {
-      ovl.sendMessage(jid, { text: "Une erreur est survenue lors du rejet des demandes." });
+      ovl.sendMessage(jid, { text: "Une erreur est survenue lors du rejet des demandes." }, { quoted: cmd_options.ms });
     }
   }
 );
@@ -810,28 +810,28 @@ ovlcmd(
     alias: ["upp"]
   },
   async (jid, ovl, cmd_options) => {
-    const { arg, verif_Groupe, msg_Repondu, verif_Admin, prenium_id, verif_Ovl_Admin } = cmd_options;
+    const { arg, verif_Groupe, msg_Repondu, verif_Admin, prenium_id, verif_Ovl_Admin, ms } = cmd_options;
 
     if (!(verif_Admin || prenium_id)) {
-      return ovl.sendMessage(jid, { text: `Vous n'avez pas les permissions requises pour modifier la photo du groupe.` });
+      return ovl.sendMessage(jid, { text: `Vous n'avez pas les permissions requises pour modifier la photo du groupe.` }, { quoted: ms });
     }
 
     if (!verif_Ovl_Admin) {
-      return ovl.sendMessage(jid, { text: "Je dois être administrateur pour effectuer cette action." });
+      return ovl.sendMessage(jid, { text: "Je dois être administrateur pour effectuer cette action." }, { quoted: ms });
     }
 
     if (!msg_Repondu || !msg_Repondu.imageMessage) {
-      return ovl.sendMessage(jid, { text: `Mentionnez une image.` });
+      return ovl.sendMessage(jid, { text: `Mentionnez une image.` }, { quoted: ms });
     }
 
     try {
       if (msg_Repondu?.imageMessage) {
         const img = await ovl.dl_save_media_ms(msg_Repondu.imageMessage);
         await ovl.updateProfilePicture(jid, { url: img });
-        ovl.sendMessage(jid, { text: "✅ La photo de profil du groupe a été mise à jour avec succès." });
+        ovl.sendMessage(jid, { text: "✅ La photo de profil du groupe a été mise à jour avec succès." }, { quoted: ms });
     } }catch (error) {
       console.error("Erreur lors du changement de PP :", error);
-      ovl.sendMessage(jid, { text: "❌ Une erreur est survenue lors de la modification de la photo du groupe." });
+      ovl.sendMessage(jid, { text: "❌ Une erreur est survenue lors de la modification de la photo du groupe." }, { quoted: ms });
     }
   }
 );
@@ -845,22 +845,22 @@ ovlcmd(
     alias: ["rpp"]
   },
   async (jid, ovl, cmd_options) => {
-    const { verif_Groupe, verif_Admin, prenium_id, verif_Ovl_Admin } = cmd_options;
+    const { verif_Groupe, verif_Admin, prenium_id, verif_Ovl_Admin, ms } = cmd_options;
 
     if (!(verif_Admin || prenium_id)) {
-      return ovl.sendMessage(jid, { text: `Vous n'avez pas les permissions requises pour supprimer la photo du groupe.` });
+      return ovl.sendMessage(jid, { text: `Vous n'avez pas les permissions requises pour supprimer la photo du groupe.` }, { quoted: ms });
     }
 
     if (!verif_Ovl_Admin) {
-      return ovl.sendMessage(jid, { text: "Je dois être administrateur pour effectuer cette action." });
+      return ovl.sendMessage(jid, { text: "Je dois être administrateur pour effectuer cette action." }, { quoted: ms });
     }
 
     try {
       await ovl.removeProfilePicture(jid);
-      ovl.sendMessage(jid, { text: "✅ La photo de profil du groupe a été supprimée avec succès." });
+      ovl.sendMessage(jid, { text: "✅ La photo de profil du groupe a été supprimée avec succès." }, { quoted: ms });
     } catch (error) {
       console.error("Erreur lors de la suppression de la PP :", error);
-      ovl.sendMessage(jid, { text: "❌ Une erreur est survenue lors de la suppression de la photo du groupe." });
+      ovl.sendMessage(jid, { text: "❌ Une erreur est survenue lors de la suppression de la photo du groupe." }, { quoted: ms });
     }
   }
 );
@@ -874,15 +874,15 @@ ovlcmd(
     desc: "Enregistre les contacts de tous les membres du groupe dans un fichier VCF",
   },
   async (ms_org, ovl, cmd_options) => {
-    const { verif_Groupe } = cmd_options;
+    const { verif_Groupe, ms } = cmd_options;
 
     try {
-      if (!verif_Groupe) return ovl.sendMessage(ms_org, { text: "Cette commande doit être utilisée dans un groupe." });
+      if (!verif_Groupe) return ovl.sendMessage(ms_org, { text: "Cette commande doit être utilisée dans un groupe." }, { quoted: ms });
         
       const groupMetadata = await ovl.groupMetadata(ms_org).catch((e) => null);
 
       if (!groupMetadata || !groupMetadata.participants) {
-        return ovl.sendMessage(ms_org, { text: 'Échec de la récupération des métadonnées du groupe ou de la liste des participants.' });
+        return ovl.sendMessage(ms_org, { text: 'Échec de la récupération des métadonnées du groupe ou de la liste des participants.' }, { quoted: ms });
       }
 
       const participants = groupMetadata.participants;
@@ -902,12 +902,12 @@ ovlcmd(
       const message = `*TOUS LES CONTACTS DES MEMBRES ENREGISTRÉS*\nGroupe : *${groupName}*\nContacts : *${participants.length}*`;
 
       const vcfFile = fs.readFileSync(vcfFilePath);
-      await ovl.sendMessage(ms_org, { document: vcfFile, mimetype: 'text/vcard', filename: vcfFileName, caption: message });
+      await ovl.sendMessage(ms_org, { document: vcfFile, mimetype: 'text/vcard', filename: vcfFileName, caption: message }, { quoted: ms });
 
       fs.unlinkSync(vcfFilePath); 
     } catch (error) {
       console.error('Erreur lors du traitement de la commande vcf:', error);
-      return ovl.sendMessage(ms_org, { text: 'Une erreur est survenue lors du traitement de la commande vcf.' });
+      return ovl.sendMessage(ms_org, { text: 'Une erreur est survenue lors du traitement de la commande vcf.' }, { quoted: ms });
     }
   }
 );
