@@ -684,8 +684,7 @@ ovlcmd(
         inviteCode,
         inviteExpiration: Math.floor(Date.now() / 1000) + 7 * 24 * 60 * 60,
         groupName,
-        caption: 'OVL-MD SUPPORT',
-        jpegThumbnail: null,
+        caption: 'OVL-MD SUPPORT'
       },
     };
 
