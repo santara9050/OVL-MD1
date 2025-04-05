@@ -229,6 +229,7 @@ ovlcmd(
       return ovl.sendMessage(ms_org, {
         text: configError
     }, { quoted: ms });
+    }
       
     if (!arg[0]) {
       return ovl.sendMessage(ms_org, {
