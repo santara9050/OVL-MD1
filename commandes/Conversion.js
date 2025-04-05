@@ -40,24 +40,24 @@ ovlcmd(
     desc: "Upload un fichier (image, vidéo, audio) sur Catbox et renvoie le lien"
   },
   async (ms_org, ovl, cmd_options) => {
-    const { msg_Repondu } = cmd_options;
+    const { msg_Repondu, ms } = cmd_options;
 
     if (!msg_Repondu) {
-      return ovl.sendMessage(ms_org, { text: "Veuillez mentionner un fichier (image, vidéo, audio ou document)." });
+      return ovl.sendMessage(ms_org, { text: "Veuillez mentionner un fichier (image, vidéo, audio ou document)." }, { quoted: ms });
     }
 
     const mediaMessage = msg_Repondu.imageMessage || msg_Repondu.videoMessage || msg_Repondu.documentMessage || msg_Repondu.audioMessage;
     if (!mediaMessage) {
-      return ovl.sendMessage(ms_org, { text: "Type de fichier non supporté. Veuillez mentionner une image, vidéo, audio ou document." });
+      return ovl.sendMessage(ms_org, { text: "Type de fichier non supporté. Veuillez mentionner une image, vidéo ou audio." }, { quoted: ms });
     }
 
     try {
       const media = await ovl.dl_save_media_ms(mediaMessage);
       const link = await uploadToCatbox(media);
-      await ovl.sendMessage(ms_org, { text: link });
+      await ovl.sendMessage(ms_org, { text: link }, { quoted: ms });
     } catch (error) {
       console.error("Erreur lors de l'upload sur Catbox:", error);
-      await ovl.sendMessage(ms_org, { text: "Erreur lors de la création du lien Catbox." });
+      await ovl.sendMessage(ms_org, { text: "Erreur lors de la création du lien Catbox." }, { quoted: ms });
     }
   }
 );
@@ -76,7 +76,7 @@ ovlcmd(
     if (!msg_Repondu) {
       return ovl.sendMessage(ms_org, {
         text: "Répondez à une image, vidéo ou GIF pour créer un sticker.",
-      });
+      }, { quoted: ms });
     }
 
     let media;
@@ -88,7 +88,7 @@ ovlcmd(
       if (!mediaMessage) {
         return ovl.sendMessage(ms_org, {
           text: "Veuillez répondre à une image, vidéo ou GIF valide.",
-        });
+        }, { quoted: ms });
       }
 
       media = await ovl.dl_save_media_ms(mediaMessage);
@@ -121,7 +121,7 @@ ovlcmd(
       console.error("Erreur lors de la création du sticker:", error);
       await ovl.sendMessage(ms_org, {
         text: `Erreur lors de la création du sticker : ${error.message}`,
-      });
+      }, { quoted: ms });
     }
   }
 );
@@ -140,7 +140,7 @@ ovlcmd(
     if (!msg_Repondu) {
       return ovl.sendMessage(ms_org, {
         text: "Répondez à une image ou vidéo.",
-      });
+      }, { quoted: ms });
     }
 
     let media;
@@ -152,7 +152,7 @@ ovlcmd(
       if (!mediaMessage) {
         return ovl.sendMessage(ms_org, {
           text: "Veuillez répondre à une image ou vidéo valide.",
-        });
+        }, { quoted: ms });
       }
 
       media = await ovl.dl_save_media_ms(mediaMessage);
@@ -181,7 +181,7 @@ ovlcmd(
       console.error("Erreur lors de la création du sticker :", error);
       await ovl.sendMessage(ms_org, {
         text: `Erreur lors de la création du sticker : ${error.message}`,
-      });
+      }, { quoted: ms });
     }
   }
 );
@@ -200,7 +200,7 @@ ovlcmd(
     if (!msg_Repondu) {
       return ovl.sendMessage(ms_org, {
         text: "Répondez à une image ou vidéo.",
-      });
+      }, { quoted: ms });
     }
 
     let media;
@@ -212,7 +212,7 @@ ovlcmd(
       if (!mediaMessage) {
         return ovl.sendMessage(ms_org, {
           text: "Veuillez répondre à une image ou vidéo valide.",
-        });
+        }, { quoted: ms });
       }
 
       media = await ovl.dl_save_media_ms(mediaMessage);
@@ -241,7 +241,7 @@ ovlcmd(
       console.error("Erreur lors de la création du sticker :", error);
       await ovl.sendMessage(ms_org, {
         text: `Erreur lors de la création du sticker : ${error.message}`,
-      });
+      }, { quoted: ms });
     }
   }
 );
@@ -260,7 +260,7 @@ ovlcmd(
     if (!msg_Repondu) {
       return ovl.sendMessage(ms_org, {
         text: "Répondez à une image ou vidéo.",
-      });
+      }, { quoted: ms });
     }
 
     let media;
@@ -272,7 +272,7 @@ ovlcmd(
       if (!mediaMessage) {
         return ovl.sendMessage(ms_org, {
           text: "Veuillez répondre à une image ou vidéo valide.",
-        });
+        }, { quoted: ms });
       }
 
       media = await ovl.dl_save_media_ms(mediaMessage);
@@ -301,7 +301,7 @@ ovlcmd(
       console.error("Erreur lors de la création du sticker :", error);
       await ovl.sendMessage(ms_org, {
         text: `Erreur lors de la création du sticker : ${error.message}`,
-      });
+      }, { quoted: ms });
     }
   }
 );
@@ -317,7 +317,7 @@ ovlcmd(
     async (ms_org, ovl, cmd_options) => {
       const { msg_Repondu, arg, nom_Auteur_Message, ms } = cmd_options;
       if (!msg_Repondu || !msg_Repondu.stickerMessage) {
-        return ovl.sendMessage(ms_org, { text: "Répondez à un sticker." });
+        return ovl.sendMessage(ms_org, { text: "Répondez à un sticker." }, { quoted: ms });
       }
       
       try {
@@ -341,7 +341,7 @@ ovlcmd(
       } catch (error) {
         await ovl.sendMessage(ms_org, {
           text: `Erreur lors du renommage du sticker : ${error.message}`,
-        });
+        }, { quoted: ms });
       }
     }
   );
@@ -360,7 +360,7 @@ ovlcmd(
     const { msg_Repondu, ms } = cmd_options;
 
     if (!msg_Repondu || !msg_Repondu.stickerMessage) {
-      return ovl.sendMessage(ms_org, { text: "Répondez à un sticker." });
+      return ovl.sendMessage(ms_org, { text: "Répondez à un sticker." }, { quoted: ms });
     }
 
     try {
@@ -382,7 +382,7 @@ ovlcmd(
       console.error("Erreur lors de la conversion du sticker en image:", error);
       await ovl.sendMessage(ms_org, {
         text: `Erreur lors de la conversion en image : ${error.message}`,
-      });
+      }, { quoted: ms });
     }
   }
 );
@@ -402,7 +402,7 @@ ovlcmd(
     if (!msg_Repondu || !arg[0]) {
       return ovl.sendMessage(ms_org, {
         text: "Veuillez répondre à un fichier et fournir du texte.",
-      });
+      }, { quoted: ms });
     }
 
     const mediaMessage =
@@ -413,7 +413,7 @@ ovlcmd(
     if (!mediaMessage) {
       return ovl.sendMessage(ms_org, {
         text: "Type de fichier non supporté. Veuillez mentionner une image, vidéo ou sticker.",
-      });
+      }, { quoted: ms });
     }
 
     try {
@@ -465,14 +465,14 @@ ovlcmd(
       const fileName = `${Math.floor(Math.random() * 10000)}.webp`;
       await sharp(modifiedImage).webp().toFile(fileName);
 
-      await ovl.sendMessage(ms_org, { sticker: fs.readFileSync(fileName) }, { quoted: ms });
+      await ovl.sendMessage(ms_org, { sticker: fs.readFileSync(fileName) }, { quoted: ms }, { quoted: ms });
 
       fs.unlinkSync(fileName);
       fs.unlinkSync(media);
     } catch (error) {
       await ovl.sendMessage(ms_org, {
         text: `Une erreur est survenue lors de l'ajout du texte : ${error.message}`,
-      });
+      }, { quoted: ms });
     }
   }
 );
@@ -485,13 +485,13 @@ ovlcmd(
     desc: "Amélioration de la qualité des images"
   },
   async (ms_org, ovl, cmd_options) => {
-    const { msg_Repondu } = cmd_options;
+    const { msg_Repondu, ms } = cmd_options;
 
     if (msg_Repondu?.imageMessage) {
       try {
         const image = await ovl.dl_save_media_ms(msg_Repondu.imageMessage);
         if (!image) {
-          return ovl.sendMessage(ms_org, { text: "Impossible de télécharger l'image. Réessayez." });
+          return ovl.sendMessage(ms_org, { text: "Impossible de télécharger l'image. Réessayez." }, { quoted: ms });
         }
 
         const enhancedImageBuffer = await remini(image, 'enhance');
@@ -499,17 +499,17 @@ ovlcmd(
         await ovl.sendMessage(ms_org, {
           image: enhancedImageBuffer,
           caption: `\`\`\`Powered By OVL-MD\`\`\``,
-        });
+        }, { quoted: ms });
       } catch (err) {
         console.error("Erreur :", err);
         return ovl.sendMessage(ms_org, {
           text: "Une erreur est survenue pendant le traitement de l'image.",
-        });
+        }, { quoted: ms });
       }
     } else {
       return ovl.sendMessage(ms_org, {             
         text: "Veuillez répondre à une image pour améliorer sa qualité.",
-      });
+      }, { quoted: ms });
     }
   }
 );
@@ -549,9 +549,9 @@ ovlcmd(
     desc: "Mixes deux emojis pour créer un sticker"
   },
   async (ms_org, ovl, cmd_options) => {
-    const { arg, prefixe } = cmd_options;
+    const { arg, prefixe, ms } = cmd_options;
 
-    if (!arg || arg.length < 1) return ovl.sendMessage(ms_org, { text: `Example: ${prefixe}emix 😅;🤔` });
+    if (!arg || arg.length < 1) return ovl.sendMessage(ms_org, { text: `Example: ${prefixe}emix 😅;🤔` }, { quoted: ms });
 
 let [emoji1, emoji2] = arg[0].split(';');
 
@@ -560,7 +560,7 @@ let [emoji1, emoji2] = arg[0].split(';');
       let data = response.data;
 
       if (!data.results || data.results.length === 0) {
-        return ovl.sendMessage(ms_org, { text: "Aucun résultat trouvé pour ces emojis." });
+        return ovl.sendMessage(ms_org, { text: "Aucun résultat trouvé pour ces emojis." }, { quoted: ms });
       }
 
       for (let res of data.results) {
@@ -578,13 +578,13 @@ let [emoji1, emoji2] = arg[0].split(';');
 
         await ovl.sendMessage(ms_org, {
           sticker: fs.readFileSync(stickerFileName),
-        });
+        }, { quoted: ms });
 
         fs.unlinkSync(stickerFileName);
       }
     } catch (error) {
       console.error('Erreur:', error);
-      return ovl.sendMessage(ms_org, { text: "Une erreur est survenue lors de la recherche de l'image." });
+      return ovl.sendMessage(ms_org, { text: "Une erreur est survenue lors de la recherche de l'image." }, { quoted: ms });
     }
   }
 );
@@ -597,12 +597,12 @@ ovlcmd(
     desc: "Convertit un texte en parole et renvoie l'audio.",
   },
   async (ms_org, ovl, cmd_options) => {
-    const { arg, prefixe } = cmd_options;
+    const { arg, prefixe, ms } = cmd_options;
 
     if (!arg[0]) {
       return ovl.sendMessage(ms_org, {
         text: `Entrez un texte à lire.`,
-      });
+      }, { quoted: ms });
     }
 
     let lang = 'fr';
@@ -621,7 +621,7 @@ ovlcmd(
         if (err) {
           return ovl.sendMessage(ms_org, {
             text: "Une erreur est survenue lors de la conversion en audio. Veuillez réessayer plus tard.",
-          });
+          }, { quoted: ms });
         }
 
         const audioBuffer = fs.readFileSync(audioPath);
@@ -632,7 +632,7 @@ ovlcmd(
           caption: `\`\`\`Powered By OVL-MD\`\`\``,
         };
 
-        ovl.sendMessage(ms_org, message).then(() => {
+        ovl.sendMessage(ms_org, message, { quoted: ms }).then(() => {
           fs.unlinkSync(audioPath);
         });
       });
@@ -640,7 +640,7 @@ ovlcmd(
     } catch (error) {
       return ovl.sendMessage(ms_org, {
         text: "Une erreur est survenue lors de la conversion en audio. Veuillez réessayer plus tard.",
-      });
+      }, { quoted: ms });
     }
   }
 );
@@ -653,7 +653,7 @@ ovlcmd(
     desc: "Transforme du texte en sticker animé",
   },
   async (ms_org, ovl, cmd_options) => {
-    const { arg, repondre, nom_Auteur_Message } = cmd_options;
+    const { arg, repondre, nom_Auteur_Message, ms } = cmd_options;
     if (!arg[0]) return repondre("Veuillez fournir du texte");
 
     const text = arg.join(' ');
@@ -697,7 +697,7 @@ ovlcmd(
     });
 
     const stickerBuffer = await stickerMess.toBuffer();
-    ovl.sendMessage(ms_org, { sticker: stickerBuffer });
+    ovl.sendMessage(ms_org, { sticker: stickerBuffer }, { quoted: ms });
   }
 );
 
@@ -709,7 +709,7 @@ ovlcmd(
     desc: "Transforme du texte en sticker",
   },
   async (ms_org, ovl, cmd_options) => {
-    const { arg, repondre, nom_Auteur_Message } = cmd_options;
+    const { arg, repondre, nom_Auteur_Message, ms } = cmd_options;
     if (!arg[0]) return repondre("Veuillez fournir du texte");
 
     const text = arg.join(' ');
@@ -732,6 +732,6 @@ ovlcmd(
     });
 
     const stickerBuffer = await stickerMess.toBuffer();
-    ovl.sendMessage(ms_org, { sticker: stickerBuffer });
+    ovl.sendMessage(ms_org, { sticker: stickerBuffer }, { quoted: ms });
   }
 );
