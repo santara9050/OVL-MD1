@@ -791,7 +791,7 @@ ovl.ev.on("connection.update", async (con) => {
         if (limiteTemps > 0) {
             chrono = setTimeout(() => {
                 ovl.ev.off('messages.upsert', analyseur);
-                refuser(new Error("Temps écoulé sans réponse."));
+                refuser(new Error("Timeout"));
             }, limiteTemps);
         }
     });
