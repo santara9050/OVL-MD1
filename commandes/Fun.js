@@ -16,7 +16,7 @@ ovlcmd(
         const { arg, ms } = cmd_options;
         const text = arg.join(" ");
         if (!text) {
-            return await ovl.sendMessage(ms_org, { text: "Veuillez fournir un texte à inverser !" });
+            return await ovl.sendMessage(ms_org, { text: "Veuillez fournir un texte à inverser !" }, { quoted: ms });
         }
         const flipped = text.split("").reverse().join("");
         await ovl.sendMessage(ms_org, { text: flipped }, { quoted: ms });
@@ -33,7 +33,7 @@ ovlcmd(
         const { arg, ms } = cmd_options;
         const text = arg.join(" ");
         if (!text) {
-            return await ovl.sendMessage(ms_org, { text: "Veuillez fournir un texte" });
+            return await ovl.sendMessage(ms_org, { text: "Veuillez fournir un texte" }, { quoted: ms });
         }
         const hiddenText = `${text.split(" ").join(" ")}${String.fromCharCode(8206).repeat(4001)}`;
         await ovl.sendMessage(ms_org, { text: hiddenText }, { quoted: ms });
@@ -51,7 +51,7 @@ ovlcmd(
         const { auteur_Msg_Repondu, auteur_Message, arg, ms } = cmd_options;
         const tags = auteur_Msg_Repondu || (arg[0]?.includes("@") && `${arg[0].replace("@", "")}@s.whatsapp.net`);
          if (tags.length === 0) {
-            return await ovl.sendMessage(ms_org, { text: "Mentionne une personne" });
+            return await ovl.sendMessage(ms_org, { text: "Mentionne une personne" }, { quoted: ms });
          }
         const randomPercentage = Math.floor(Math.random() * 101);
         let comment;
@@ -67,7 +67,7 @@ ovlcmd(
         await ovl.sendMessage(ms_org, {
             text: `💘 *Ship*\n\n @${tags.split("@")[0]} & @${auteur_Message.split("@")[0]}, ${comment}.\n💖Compatibilité :*${randomPercentage}%*`,
             mentions: [tags, auteur_Message],
-        });
+        }, { quoted: ms });
     }
 );
  
@@ -78,23 +78,23 @@ ovlcmd(
         desc: "Envoie des photos de couple animées.",
         alias: ["cpp"],
     },
-    async (ms_org, ovl) => {
+    async (ms_org, ovl, cmd_options) => {
         try {
             const { data } = await axios.get("https://raw.githubusercontent.com/iamriz7/kopel_/main/kopel.json");
             const randomPicture = data[Math.floor(Math.random() * data.length)];
             await ovl.sendMessage(ms_org, {
                 image: { url: randomPicture.female },
                 caption: "❤️ *Pour Madame 💁🏻‍♀️*",
-            });
+            }, { quoted: cmd_options.ms });
             await ovl.sendMessage(ms_org, {
                 image: { url: randomPicture.male },
                 caption: "❤️ *Pour Monsieur 💁🏻‍♂️*",
-            });
+            }, { quoted: cmd_options.ms });
         } catch (error) {
             console.error("Erreur lors de la récupération des données :", error);
             await ovl.sendMessage(ms_org, {
                 text: "❗ Impossible de récupérer les images. Réessaie plus tard.",
-            });
+            }, { quoted: cmd_options.ms });
         }
     }
 );
@@ -141,21 +141,21 @@ ovlcmd(
         react: "😂",
         desc: "Renvoie une blague"
     },
-    async (ms_org, ovl) => {
+    async (ms_org, ovl, cmd_options) => {
         try {
             let apiUrl = `https://v2.jokeapi.dev/joke/Any?lang=fr`;
             let response = await axios.get(apiUrl);
             let data = response.data;
 
             if (data.type === 'single') {
-                ovl.sendMessage(ms_org, { text: `*Blague du jour :* ${data.joke}` });
+                ovl.sendMessage(ms_org, { text: `*Blague du jour :* ${data.joke}` }, { quoted: cmd_options.ms });
             } else if (data.type === 'twopart') {
-                ovl.sendMessage(ms_org, { text: `*Blague du jour :* ${data.setup}\n\n*Réponse :* ${data.delivery}` });
+                ovl.sendMessage(ms_org, { text: `*Blague du jour :* ${data.setup}\n\n*Réponse :* ${data.delivery}` }, { quoted: cmd_options.ms });
             } else {
-                ovl.sendMessage(ms_org, { text: "Désolé, je n'ai pas trouvé de blague à vous raconter." });
+                ovl.sendMessage(ms_org, { text: "Désolé, je n'ai pas trouvé de blague à vous raconter." }, { quoted: cmd_options.ms });
             }
         } catch (error) {
-            ovl.sendMessage(ms_org, { text: "Une erreur s'est produite lors de la récupération de la blague." });
+            ovl.sendMessage(ms_org, { text: "Une erreur s'est produite lors de la récupération de la blague." }, { quoted: cmd_options.ms });
         }
     }
 );
@@ -193,7 +193,7 @@ ovlcmd(
         desc: "Affiche le rang d'un utilisateur selon ses messages envoyés et gère l'activation/désactivation globale du level up."
     },
     async (ms_org, ovl, cmd_options) => {
-        const { arg, auteur_Message, auteur_Msg_Repondu } = cmd_options;
+        const { arg, auteur_Message, auteur_Msg_Repondu, ms } = cmd_options;
          
         const userId = (arg[0]?.includes("@") && `${arg[0].replace("@", "")}@s.whatsapp.net`) || auteur_Msg_Repondu || auteur_Message;
 
@@ -210,7 +210,7 @@ ovlcmd(
 
         const user = await Ranks.findOne({ where: { id: userId } });
         if (!user) {
-            return ovl.sendMessage(ms_org, { text: "Vous n'avez pas encore de rang. Commencez à interagir pour en obtenir un !" });
+            return ovl.sendMessage(ms_org, { text: "Vous n'avez pas encore de rang. Commencez à interagir pour en obtenir un !" }, { quoted: ms });
         }
 
         const { name, level, exp, messages } = user;
@@ -229,7 +229,7 @@ ovlcmd(
         await ovl.sendMessage(ms_org, {
             image: { url: pp },
             caption: message,
-        });
+        }, { quoted: ms });
     }
 );
 
@@ -241,14 +241,14 @@ ovlcmd(
         react: "🥇",
         desc: "Voir les meilleurs utilisateurs"
     },
-    async (ms_org, ovl) => {
+    async (ms_org, ovl, cmd_options) => {
         const topUsers = await Ranks.findAll({
             order: [['messages', 'DESC']],
             limit: 10
         });
 
         if (topUsers.length === 0) {
-            return ovl.sendMessage(ms_org, { text: "Aucune donnée disponible pour le moment." });
+            return ovl.sendMessage(ms_org, { text: "Aucune donnée disponible pour le moment." }, { quoted: cmd_options.ms });
         }
 
         let rankMessage = `
@@ -261,6 +261,6 @@ ovlcmd(
 ┃    🔰 *Niveau :* ${user.level} (${levels[user.level - 1]?.name || "OVL-GOD-LEVEL"})\n┃\n`;
         });
 rankMessage += `╰─────────────────────╯`;
-        await ovl.sendMessage(ms_org, { text: rankMessage });
+        await ovl.sendMessage(ms_org, { text: rankMessage }, { quoted: cmd_options.ms });
     }
 );
