@@ -152,34 +152,29 @@ ovlcmd(
     if (!prenium_id) {
       return ovl.sendMessage(ms_org, {
         text: "Cette commande est réservée aux utilisateurs premium",
-        quoted: ms,
-      });
+        }, { quoted: ms });
     }
     const configError = checkConfig();
     if (configError) {
       return ovl.sendMessage(ms_org, {
         text: configError,
-        quoted: ms,
-      });
+        }, { quoted: ms });
     }
     if (!arg[0] || !arg.includes("=")) {
       return ovl.sendMessage(ms_org, {
         text: "*Utilisation :* `setvar clé = valeur`",
-        quoted: ms,
-      });
+        }, { quoted: ms });
     }
     const [key, ...valueParts] = arg.join(" ").split("=");
     const value = valueParts.join("=").trim();
     const result = await manageEnvVar("setvar", key.trim(), value);
     await ovl.sendMessage(ms_org, {
       text: result,
-      quoted: ms,
-    });
+      }, { quoted: ms });
     const restartResult = await restartRenderService();
     await ovl.sendMessage(ms_org, {
       text: restartResult,
-      quoted: ms,
-    });
+       }, { quoted: ms });
     return;
   }
 );
@@ -195,28 +190,24 @@ ovlcmd(
     if (!prenium_id) {
       return ovl.sendMessage(ms_org, {
         text: "Cette commande est réservée aux utilisateurs premium",
-        quoted: ms,
-      });
+       }, { quoted: ms });
     }
     const configError = checkConfig();
     if (configError) {
       return ovl.sendMessage(ms_org, {
         text: configError,
-        quoted: ms,
-      });
+        }, { quoted: ms });
     }
     if (!arg[0]) {
       return ovl.sendMessage(ms_org, {
         text: "*Utilisation :* `getvar clé` ou `getvar all` pour obtenir toutes les variables",
-        quoted: ms,
-      });
+      }, { quoted: ms });
     }
     const key = arg[0];
     const result = await manageEnvVar("getvar", key);
     return ovl.sendMessage(ms_org, {
-      text: result,
-      quoted: ms,
-    });
+      text: result
+    }, { quoted: ms });
   }
 );
 
@@ -231,33 +222,28 @@ ovlcmd(
     if (!prenium_id) {
       return ovl.sendMessage(ms_org, {
         text: "Cette commande est réservée aux utilisateurs premium",
-        quoted: ms,
-      });
+      }, { quoted: ms });
     }
     const configError = checkConfig();
     if (configError) {
       return ovl.sendMessage(ms_org, {
-        text: configError,
-        quoted: ms,
-      });
-    }
+        text: configError
+    }, { quoted: ms });
+      
     if (!arg[0]) {
       return ovl.sendMessage(ms_org, {
-        text: "*Utilisation :* `delvar clé`",
-        quoted: ms,
-      });
+        text: "*Utilisation :* `delvar clé`"
+      }, { quoted: ms });
     }
     const key = arg[0];
     const result = await manageEnvVar("delvar", key);
     await ovl.sendMessage(ms_org, {
-      text: result,
-      quoted: ms,
-    });
+      text: resul
+       }, { quoted: ms });
     const restartResult = await restartRenderService();
     await ovl.sendMessage(ms_org, {
-      text: restartResult,
-      quoted: ms,
-    });
+      text: restartResult
+    }, { quoted: ms });
     return;
   }
 );
@@ -273,16 +259,14 @@ ovlcmd(
 
     if (!prenium_id) {
       return ovl.sendMessage(ms_org, {
-        text: "Cette commande est réservée aux utilisateurs premium",
-        quoted: ms,
-      });
+        text: "Cette commande est réservée aux utilisateurs premium"
+      }, { quoted: ms });
     }
 
     if (!RENDER_API_KEY || !SERVICE_ID) {
       return ovl.sendMessage(ms_org, {
-        text: "Erreur : Les informations de configuration pour Render (API Key et Service ID) ne sont pas définies. Merci de les ajouter.",
-        quoted: ms,
-      });
+        text: "Erreur : Les informations de configuration pour Render (API Key et Service ID) ne sont pas définies. Merci de les ajouter."
+      }, { quoted: ms });
     }
 
     try {
@@ -292,21 +276,18 @@ ovlcmd(
       if (renderCommit == gitCommit) {
         return ovl.sendMessage(ms_org, {
           text: "Le bot est déjà à jour",
-          quoted: ms,
-        });
+        }, { quoted: ms });
       } else {
         const deployResult = await deployRender();
         return ovl.sendMessage(ms_org, {
-          text: deployResult,
-          quoted: ms,
-        });
+          text: deployResult
+        }, { quoted: ms });
       }
     } catch (error) {
       console.error(error);
       return ovl.sendMessage(ms_org, {
-        text: `*Erreur* : ${error.message}`,
-        quoted: ms,
-      });
+        text: `*Erreur* : ${error.message}`
+      }, { quoted: ms });
     }
   }
 );
