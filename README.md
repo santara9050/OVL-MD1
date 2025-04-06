@@ -28,12 +28,11 @@
 ### Deployer sur panel
 - **Créer un compte:** [compte-panel](https://bot-hosting.net) 
 - **Deployer:**
-- Étape 1: creer un serveur
-- Étape 2: créé une fichier ```index.js``` sur le serveur
+- Étape 1: créer un serveur
+- Étape 2: créer une fichier ```index.js``` sur le serveur
 - Étape 3: Démarrer le bot
-- Fichier a coller dans l'index:
+- Fichier à coller dans l'index:
 ```sh
-
 const { writeFileSync, existsSync, mkdirSync } = require('fs');
 const { spawnSync } = require('child_process');
 const path = require('path');
@@ -85,6 +84,52 @@ runCommand('npm', ['run', 'Ovl'], { cwd: 'ovl' });
 console.log('Le bot est en cours d\'exécution...');
 
 ```
+
+### Deployer sur GitHub
+- Étape 1: Créer un fichier «.env» directement dans votre fork, puis entre vos informations
+- Étape 2: Créer un fichier «.github/workflows/deploy.yml», puis validé les changements
+- Fichier à collé dans «.github/workflows/deploy.yml»:
+```sh
+name: OVL-MD Bot CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  schedule:
+    - cron: '0 */5 * * *'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [20.x]
+
+    steps:
+      - name: Récupération du dépôt
+        uses: actions/checkout@v3
+
+      - name: Configuration de Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Installation des dépendances + ffmpeg
+        run: |
+          sudo apt update
+          sudo apt install -y ffmpeg
+          npm i
+
+      - name: Démarrage du bot
+        run: |
+          timeout 18300s npm run Ovl
+```
+
  **Exemple de fichier .env:**
  ```sh
 PREFIXE=
