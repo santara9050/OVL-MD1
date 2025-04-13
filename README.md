@@ -23,7 +23,7 @@
 
 ### Deployer sur Koyeb
 - **Creer un compte:** [compte-koyeb](https://app.koyeb.com/auth/signup) 
-- **Deployer:** [Deployer sur Koyeb](https://app.koyeb.com/deploy?name=ovl-md&repository=Ainz-fkk%2FOVL-MD&branch=main&builder=dockerfile&instance_type=free&env%5BLEVEL_UP%5D=non&env%5BMENU%5D=https%3A%2F%2Fi.ibb.co%2Fynx9QcZ%2Fimage.jpg&env%5BMODE%5D=public&env%5BNOM_OWNER%5D=Ainz&env%5BNUMERO_OWNER%5D=226xxxxxxxx&env%5BPREFIXE%5D=%F0%9F%97%BF&env%5BSESSION_ID%5D=Ovl-MD_qLA7XFLP_SESSION-ID&env%5BSTICKER_AUTHOR_NAME%5D=OVL-MD&env%5BSTICKER_PACK_NAME%5D=Wa-sticker)
+- **Deployer:** [Deployer sur Koyeb](https://app.koyeb.com/deploy?name=ovl-md&repository=Ainz-fkk%2FOVL-MD&branch=main&builder=dockerfile&instance_type=free&instances_min=0&autoscaling_sleep_idle_delay=300&env%5BLEVEL_UP%5D=non&env%5BMENU%5D=https%3A%2F%2Fi.ibb.co%2Fynx9QcZ%2Fimage.jpg&env%5BMODE%5D=public&env%5BNOM_OWNER%5D=Ainz&env%5BNUMERO_OWNER%5D=226xxxxxxxx&env%5BPREFIXE%5D=%F0%9F%97%BF&env%5BSESSION_ID%5D=Ovl-MD_qLA7XFLP_SESSION-ID&env%5BSTICKER_AUTHOR_NAME%5D=OVL-MD&env%5BSTICKER_PACK_NAME%5D=Wa-sticker)
  
 ### Deployer sur panel
 - **Créer un compte:** [compte-panel](https://bot-hosting.net) 
