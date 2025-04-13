@@ -29,7 +29,7 @@
 - **Créer un compte:** [compte-panel](https://bot-hosting.net) 
 - **Deployer:**
 - Étape 1: créer un serveur
-- Étape 2: créer une fichier ```index.js``` sur le serveur
+- Étape 2: créer une fichier ```index.js``` ou ```main.js``` sur le serveur
 - Étape 3: Démarrer le bot
 - Fichier à coller dans l'index:
 ```sh
